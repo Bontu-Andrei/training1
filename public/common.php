@@ -50,6 +50,7 @@ function template_header($title) {
                 <nav>
                     <h4><a href="index.php">Index</a></h4>
                     <h4><a href="cart.view.php">Cart</a></h4>
+                    <h4><a href="products.php">Products</a></h4>
                 </nav>
             </div>
         </header>

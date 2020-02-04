@@ -1,6 +1,6 @@
 <?php
 
-require_once 'config.php';
+require_once "config.php";
 
 function pdo_connect_mysql() {
     try {

@@ -4,7 +4,7 @@
 
     require_once "common.php";
 
-    $pdo = pdo_connect_mysql();
+    $pdo = pdoConnectMysql();
 
     $stmt = $pdo->prepare("SELECT * FROM products LIMIT 500");
     $stmt->execute();

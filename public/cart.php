@@ -4,10 +4,10 @@
 
     require_once "common.php";
 
-    $pdo = pdo_connect_mysql();
+    $pdo = pdoConnectMysql();
 
     //Add To Cart
-    if (isset($_POST['product_id']) && is_numeric($_POST['product_id'])) {
+    if (isset($_POST["product_id"]) && is_numeric($_POST["product_id"])) {
         $product_id = (int)$_POST["product_id"];
 
         $stmt = $pdo->prepare("SELECT * FROM products WHERE id = ?");
@@ -31,20 +31,22 @@
         exit();
     }
 
-    //List products from cart
-    $productsInCart = isset($_SESSION['cart']) ? $_SESSION['cart'] : array();
-    $products = [];
+    // Remove products from cart
+    if (isset($_POST["product_id_to_remove"])) {
+        if (is_numeric($_POST["product_id_to_remove"]) && count($_SESSION["cart"]) > 0) {
+            // Remove the product from the shopping cart
+            foreach ($_SESSION["cart"] as $index => $productInCartId) {
+                if ((int) $productInCartId === (int) $_POST["product_id_to_remove"]) {
+                    unset($_SESSION["cart"][$index]);
 
-    if (count($productsInCart) > 0) {
-        // Products in cart array to question mark string array, we need the SQL statement to include IN (?,?,?,...etc)
-        $arrayToQuestionMarks = implode(",", array_fill(0, count($productsInCart), "?"));
-
-        $stmt = $pdo->prepare("SELECT * FROM products WHERE id IN (" . $arrayToQuestionMarks . ")");
-        // We only need the array keys, not the values, the keys are the id's of the products
-        $stmt->execute(array_values($productsInCart));
-        // Fetch the products from the database and return the result as an Array
-        $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    header("Location: cart.view.php");
+                    exit();
+                }
+            }
+        }
     }
+
+
 
 
 

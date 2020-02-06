@@ -1,50 +1,103 @@
 <?php
 
-    session_start();
+require_once "common.php";
 
-    require_once "common.php";
+$session = session();
 
-    $pdo = pdoConnectMysql();
+$pdo = pdoConnectMysql();
 
-    //Add To Cart
-    if (isset($_POST["product_id"]) && is_numeric($_POST["product_id"])) {
-        $product_id = (int)$_POST["product_id"];
+$products = getAllProductsFromCart();
 
-        $stmt = $pdo->prepare("SELECT * FROM products WHERE id = ?");
-        $stmt->execute([$product_id]);
+//Add To Cart
+if (isset($_POST["product_id"]) && is_numeric($_POST["product_id"])) {
+    $product_id = (int)$_POST["product_id"];
 
-        $product = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt = $pdo->prepare("SELECT * FROM products WHERE id = ?");
+    $stmt->execute([$product_id]);
 
-        // Check if the product exists (array is not empty)
-        if (count($product) > 0) {
-            // Product exists in database, now we can create/update the session variable for the cart
-            if (isset($_SESSION["cart"]) && is_array($_SESSION["cart"])) {
-                // Product is not in cart so add it
-                $_SESSION["cart"][] = $product_id;
-            } else {
-                // There are no products in cart, this will add the first product to cart
-                $_SESSION["cart"] = [$product_id];
-            }
-        }
+    $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        header("location: index.php");
-        exit();
-    }
-
-    // Remove products from cart
-    if (isset($_POST["product_id_to_remove"])) {
-        if (is_numeric($_POST["product_id_to_remove"]) && count($_SESSION["cart"]) > 0) {
-            // Remove the product from the shopping cart
-            foreach ($_SESSION["cart"] as $index => $productInCartId) {
-                if ((int) $productInCartId === (int) $_POST["product_id_to_remove"]) {
-                    unset($_SESSION["cart"][$index]);
-
-                    header("Location: cart.view.php");
-                    exit();
-                }
-            }
+    // Check if the product exists (array is not empty)
+    if (count($product) > 0) {
+        // Product exists in database, now we can create/update the session variable for the cart
+        if (isset($_SESSION["cart"]) && is_array($_SESSION["cart"])) {
+            // Product is not in cart so add it
+            $_SESSION["cart"][] = $product_id;
+        } else {
+            // There are no products in cart, this will add the first product to cart
+            $_SESSION["cart"] = [$product_id];
         }
     }
+
+    header("location: index.php");
+    exit();
+}
+
+// Remove products from cart
+if (isset($_POST["product_id_to_remove"])) {
+    if (is_numeric($_POST["product_id_to_remove"]) && count($_SESSION["cart"]) > 0) {
+        foreach ($_SESSION["cart"] as $index => $productInCartId) {
+            if ((int)$productInCartId === (int)$_POST["product_id_to_remove"]) {
+                unset($_SESSION["cart"][$index]);
+
+                header("Location: cart.php");
+                exit();
+            }
+        }
+    }
+}
+
+?>
+
+<?php include "includes/header.php"; ?>
+
+<div style="border: 1px solid black; width: 600px; height: auto;">
+    <h3 style="text-align: center"><?= trans("Cart") ?></h3>
+
+    <?php foreach ($products as $product) : ?>
+        <div style="border: 1px solid black; margin: 10px; display: flex; align-items: center;
+                                         justify-content: space-evenly;">
+
+            <img src="<?= getImagePath($product) ?>" alt="<?= trans("product_image") ?>" style="width: 100px; height: 100px;">
+
+            <div>
+                <label for="title"><b><?= trans("Title:") ?></b></label>
+                <span name="title"><?= $product["title"] ?></span> <br>
+
+                <label for="description"><b><?= trans("Description:") ?></b></label>
+                <span name="description"><?= $product["description"] ?></span> <br>
+
+                <label for="price"><b><?= trans("Price:") ?></b></label>
+                <span name="price"><?= $product["price"] ?></span> <br>
+            </div>
+
+            <form action="cart.php" method="POST">
+                <input type="hidden" name="product_id_to_remove" value="<?= $product["id"] ?>">
+
+                <button type="submit">Remove</button>
+            </form>
+        </div>
+    <?php endforeach; ?>
+
+    <div style="margin: 30px;">
+        <form action="checkout.php" method="POST">
+            <textarea name="customer_name" cols="74" rows="2" placeholder="Name" required></textarea>
+
+            <textarea name="customer_details" cols="74" rows="3" placeholder="Contact details" required></textarea>
+
+            <textarea name="customer_comments" cols="74" rows="4" placeholder="Comments"></textarea> <br>
+
+            <div style="float: right;">
+                <a href="index.php">Go to index</a>
+
+                <button type="submit" name="checkout">Checkout</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+<?php include "includes/footer.php"; ?>
 
 
 

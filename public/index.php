@@ -7,15 +7,24 @@ $pdo = pdoConnectMysql();
 
 $productsFromCart = getAllProductsFromCart();
 
-$idsProductsNotInCart = [];
+if (count($productsFromCart) > 0) {
+    $idsProductsInCart = [];
 
-foreach ($productsFromCart as $productFromCart) {
-    $idsProductsNotInCart = (int)$productFromCart["id"];
+    foreach ($productsFromCart as $productFromCart) {
+        $idsProductsInCart[] = (int)$productFromCart["id"];
+    }
+
+    $in = str_repeat("?,", count($idsProductsInCart) - 1) . "?";
+
+    $stmt = $pdo->prepare("SELECT * FROM products  WHERE id NOT IN ($in)");
+    $stmt->execute($idsProductsInCart);
+    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    //Fetch all products because we don't have any products in cart
+    $stmt = $pdo->prepare("SELECT * FROM products");
+    $stmt->execute();
+    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-
-$stmt = $pdo->prepare("SELECT * FROM products WHERE id NOT IN ($idsProductsNotInCart)");
-$stmt->execute();
-$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 if (!array_key_exists("cart", $_SESSION)) {
     $_SESSION["cart"] = [];
@@ -54,19 +63,19 @@ if (count($_SESSION["cart"]) !== 0) {
              style="width: 100px; height: 100px;">
 
         <div>
-            <label for="title"><b><?= trans("Title:") ?></b></label>
-            <span name="title"><?= $productNotInCart["title"] ?></span> <br>
+            <span><b><?= trans("Title:") ?></b></span>
+            <span><?= $productNotInCart["title"] ?></span> <br>
 
-            <label for="description"><b><?= trans("Description:") ?></b></label>
-            <span name="description"><?= $productNotInCart["description"] ?></span> <br>
+            <span><b><?= trans("Description:") ?></b></span>
+            <span><?= $productNotInCart["description"] ?></span> <br>
 
-            <label for="price"><b><?= trans("Price:") ?></b></label>
-            <span name="price"><?= $productNotInCart["price"] ?></span> <br>
+            <span><b><?= trans("Price:") ?></b></span>
+            <span><?= $productNotInCart["price"] ?></span> <br>
         </div>
 
         <form action="cart.php" method="POST">
             <input type="hidden" value="<?= $productNotInCart["id"] ?>" name="product_id">
-            <button type="submit">Add to cart</button>
+            <button type="submit"><?= trans("Add to cart") ?></button>
         </form>
     </div>
 <?php endforeach; ?>

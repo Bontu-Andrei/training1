@@ -4,7 +4,7 @@ echo <<<EOT
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Training</title>
+    <title></title>
 </head>
 <body>
 <header>
@@ -13,6 +13,7 @@ echo <<<EOT
         <nav>
             <a href="index.php">Index</a>
             <a href="cart.php">Cart</a>
+            <a href="products.php">Products</a>
         </nav>
     </div>
 </header>

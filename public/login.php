@@ -12,7 +12,7 @@ if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"]) {
 ?>
 
 <form action="/login-check.php" method="POST">
-    <h2><?= trans("Login") ?></h2>
+    <h3><?= trans("Login") ?></h3>
 
     <input type="text" name="user" value="" placeholder="<?= trans("Enter name")?>">
 

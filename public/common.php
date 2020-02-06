@@ -54,7 +54,7 @@ function serverAbsolutePath() {
     $serverName = $_SERVER["SERVER_NAME"];
 
     if (!in_array($_SERVER["SERVER_PORT"], [80, 443])) {
-        $port = ":$_SERVER[SERVER_PORT]";
+        $port = ":".$_SERVER["SERVER_PORT"];
     } else {
         $port = "";
     }
@@ -66,3 +66,50 @@ function serverAbsolutePath() {
     }
     return $scheme."://".$serverName.$port;
 }
+
+function uploadImage() {
+    $file = $_FILES['image_file'];
+    $fileName = $file['name'];
+    $fileTmpName = $file['tmp_name'];
+    $fileSize = $file['size'];
+    $fileError = $file['error'];
+    $fileType = $file['type'];
+
+    $fileExt = explode('.', $fileName);
+    $fileActualExt = strtolower(end($fileExt));
+
+    $allowed = array('jpg', 'jpeg', 'png', 'pdf');
+
+    if (in_array($fileActualExt, $allowed)) {
+        if ($fileError === 0) {
+            if ($fileSize < 1000000) {
+                $fileNameNew = uniqid('', true).".".$fileActualExt;
+
+                $fileDestination = 'images/'.$fileNameNew;
+
+                move_uploaded_file($fileTmpName, $fileDestination);
+
+                return [
+                    'success' => true,
+                    'filename' => $fileNameNew
+                ];
+            } else {
+                return [
+                    'success' => false,
+                    'error' => 'Your file is too big!'
+                ];
+            }
+        } else {
+            return [
+                'success' => false,
+                'error' => 'There was an error uploading your file!'
+            ];
+        }
+    } else {
+        return [
+            'success' => false,
+            'error' => 'You cannot upload files of this type!'
+        ];
+    }
+}
+

@@ -58,23 +58,24 @@ if (isset($_POST["product_id_to_remove"])) {
         <div style="border: 1px solid black; margin: 10px; display: flex; align-items: center;
                                          justify-content: space-evenly;">
 
-            <img src="<?= getImagePath($product) ?>" alt="<?= trans("product_image") ?>" style="width: 100px; height: 100px;">
+            <img src="<?= getImagePath($product) ?>" alt="<?= trans("product_image") ?>"
+                 style="width: 100px; height: 100px;">
 
             <div>
-                <label for="title"><b><?= trans("Title:") ?></b></label>
-                <span name="title"><?= $product["title"] ?></span> <br>
+                <span><b><?= trans("Title:") ?></b></span>
+                <span><?= $product["title"] ?></span> <br>
 
-                <label for="description"><b><?= trans("Description:") ?></b></label>
-                <span name="description"><?= $product["description"] ?></span> <br>
+                <span><b><?= trans("Description:") ?></b></span>
+                <span><?= $product["description"] ?></span> <br>
 
-                <label for="price"><b><?= trans("Price:") ?></b></label>
-                <span name="price"><?= $product["price"] ?></span> <br>
+                <span><b><?= trans("Price:") ?></b></span>
+                <span><?= $product["price"] ?></span> <br>
             </div>
 
             <form action="cart.php" method="POST">
                 <input type="hidden" name="product_id_to_remove" value="<?= $product["id"] ?>">
 
-                <button type="submit">Remove</button>
+                <button type="submit"><?= trans("Remove") ?></button>
             </form>
         </div>
     <?php endforeach; ?>
@@ -88,9 +89,9 @@ if (isset($_POST["product_id_to_remove"])) {
             <textarea name="customer_comments" cols="74" rows="4" placeholder="Comments"></textarea> <br>
 
             <div style="float: right;">
-                <a href="index.php">Go to index</a>
+                <a href="index.php"><?= trans("Go to index") ?></a>
 
-                <button type="submit" name="checkout">Checkout</button>
+                <button type="submit" name="checkout"><?= trans("Checkout") ?></button>
             </div>
         </form>
     </div>

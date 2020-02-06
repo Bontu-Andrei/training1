@@ -56,7 +56,7 @@ function serverAbsolutePath() {
     if (!in_array($_SERVER["SERVER_PORT"], [80, 443])) {
         $port = ":$_SERVER[SERVER_PORT]";
     } else {
-        $port = '';
+        $port = "";
     }
 
     if (!empty($_SERVER["HTTPS"]) && (strtolower($_SERVER["HTTPS"]) == "on" || $_SERVER["HTTPS"] == "1")) {

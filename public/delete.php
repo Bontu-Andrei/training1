@@ -2,8 +2,6 @@
 
 require_once "common.php";
 
-$session = session();
-
 $pdo = pdoConnectMysql();
 
 if (isset($_POST["product_id_to_remove"])) {

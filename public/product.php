@@ -2,8 +2,6 @@
 
 require_once "common.php";
 
-$session = session();
-
 if (!$_SESSION["logged_in"]) {
     // not auth so we redirect.
     header("Location: login.php");
@@ -13,46 +11,57 @@ if (!$_SESSION["logged_in"]) {
 $pdo = pdoConnectMysql();
 
 //Add a new post
-if (isset($_POST["save"]))  {
-    //Upload image
-    $response = uploadImage();
+if (count($_POST) > 0) {
+    $_SESSION['errors'] = [];
 
-    if ( ! $response["success"]) {
-        echo $response["error"];
-        exit();
+    // Validation.
+    if ( ! validateRequiredInput('title')) {
+        $_SESSION['errors']['title'] = 'The title is required.';
     }
 
-    $data = [
-        "title" => $_POST["title"],
-        "description" => $_POST["description"],
-        "price" => $_POST["price"],
-        "image_path" => $response["filename"],
-    ];
+    if ( ! validateRequiredInput('description')) {
+        $_SESSION['errors']['description'] = 'The description is required.';
+    }
 
-    $sql = "INSERT INTO products (title, description, price, image_path) VALUES (:title, :description, :price, :image_path)";
+    if ( ! validateRequiredInput('price')) {
+        $_SESSION['errors']['price'] = 'The price is required.';
+    }
 
-    $stmt = $pdo->prepare($sql);
+    if ( ! validateRequiredFileInput('image_file')) {
+        $_SESSION['errors']['image_file'] = 'The image is required.';
+    }
 
-    $stmt->execute($data);
+    if (count($_SESSION['errors']) === 0) {
+        $_SESSION['errors'] = [];
 
-    header("Location: products.php");
-    exit();
+        //Upload image
+        $response = uploadImage();
+
+        if ( ! $response["success"]) {
+            $_SESSION['errors']['error'] = $response['error'];
+        } else {
+            $data = [
+                "title" => strip_tags($_POST["title"]),
+                "description" => strip_tags($_POST["description"]),
+                "price" => strip_tags($_POST["price"]),
+                "image_path" => strip_tags($response["filename"]),
+            ];
+
+            $sql = 'INSERT INTO products (title, description, price, image_path) VALUES (:title, :description, :price, :image_path)';
+
+            $stmt = $pdo->prepare($sql);
+
+            $stmt->execute($data);
+
+            header("Location: products.php");
+            exit();
+        }
+    }
 }
-
 ?>
 
-<?php include "includes/header.php"; ?>
+<?php require_once "includes/header.php"; ?>
 
-<div style="display: flex; justify-content: center; font-size: xx-large;">
-    <form action="<?= $_SERVER['PHP_SELF'] ?>" method="POST" enctype="multipart/form-data">
-        <input type="text" name="title" placeholder="<?= trans("Title") ?>" required> <br>
-        <input type="text" name="description" placeholder="<?= trans("Description") ?>" required> <br>
-        <input type="text" name="price" placeholder="<?= trans("Price") ?>" required> <br>
-        <input required type="file" name="image_file"> <br>
+<?php require_once "includes/product-form.php"; ?>
 
-        <a href="products.php" style="font-size: large;"><?= trans("Products") ?></a>
-        <button type="submit" name="save" style="margin-left: 25%;"><?= trans("Save") ?></button>
-    </form>
-</div>
-
-<?php include "includes/footer.php"; ?>
+<?php require_once "includes/footer.php"; ?>

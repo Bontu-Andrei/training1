@@ -1,5 +1,12 @@
 <?php
-echo <<<EOT
+$h1 = trans('Training');
+$namePages = [
+    'index' => trans('Index'),
+    'cart' => trans('Cart'),
+    'products' => trans('Products')
+];
+?>
+<?=<<<EOT
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,7 +16,7 @@ echo <<<EOT
 <body>
 <header>
     <div style="text-align: center">
-        <h1>Training</h1>
+        <h1>$h1</h1>
         <nav>
             <a href="index.php">Index</a>
             <a href="cart.php">Cart</a>

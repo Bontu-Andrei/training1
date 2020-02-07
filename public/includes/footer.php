@@ -1,10 +1,12 @@
 <?php
 $year = date('Y');
-echo <<<EOT
+$p = trans('Training');
+?>
+<?=<<<EOT
 </main>
 <footer>
     <div style="text-align: center">
-        <p>&copy; $year, Training</p>
+        <p>&copy; $year, $p</p>
     </div>
 </footer>
 </body>

@@ -2,8 +2,6 @@
 
 require_once "common.php";
 
-$session = session();
-
 if (!$_SESSION["logged_in"]) {
     // not auth so we redirect.
     header("Location: login.php");
@@ -18,7 +16,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
-<?php include "includes/header.php"; ?>
+<?php require_once "includes/header.php"; ?>
 
 <div style="width: 600px;">
     <h2><?= trans("All products") ?></h2>
@@ -60,5 +58,5 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <a href="logout.php"><?= trans("Logout") ?></a>
 </div>
 
-<?php include "includes/footer.php"; ?>
+<?php require_once "includes/footer.php"; ?>
 

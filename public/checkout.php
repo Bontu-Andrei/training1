@@ -2,20 +2,17 @@
 
 require_once "common.php";
 
-$session = session();
-
 $pdo = pdoConnectMysql();
 
 if (isset($_POST["checkout"])) {
-
     $products = getAllProductsFromCart();
 
     $checkoutDate = date("Y-m-d H:i:s");
 
     $data = [
-        "customer_name" => $_POST["customer_name"],
-        "customer_details" => $_POST["customer_details"],
-        "customer_comments" => $_POST["customer_comments"],
+        "customer_name" => strip_tags($_POST["customer_name"]),
+        "customer_details" => strip_tags($_POST["customer_details"]),
+        "customer_comments" => strip_tags($_POST["customer_comments"]),
         "creation_date" => $checkoutDate,
     ];
 
@@ -38,7 +35,7 @@ if (isset($_POST["checkout"])) {
                 $htmlContent .= "
                     <table cellspacing='0' style='border: 2px dashed #FB4314; width: 50%;'>
                         <tr>
-                            <img src=".getAbsoluteImageUrl($product)." alt=".trans("product_image")."
+                            <img src=".getImageEncoding($product)." alt=".trans("product_image")."
                                 style='width: 100px;' height='100px;'>
                         </tr>
                         

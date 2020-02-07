@@ -2,8 +2,6 @@
 
 require_once "common.php";
 
-$session = session();
-
 $pdo = pdoConnectMysql();
 
 $products = getAllProductsFromCart();
@@ -49,7 +47,7 @@ if (isset($_POST["product_id_to_remove"])) {
 
 ?>
 
-<?php include "includes/header.php"; ?>
+<?php require_once "includes/header.php"; ?>
 
 <div style="border: 1px solid black; width: 600px; height: auto;">
     <h3 style="text-align: center"><?= trans("Cart") ?></h3>
@@ -98,7 +96,7 @@ if (isset($_POST["product_id_to_remove"])) {
 
 </div>
 
-<?php include "includes/footer.php"; ?>
+<?php require_once "includes/footer.php"; ?>
 
 
 

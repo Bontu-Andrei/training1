@@ -1,6 +1,0 @@
-public/config.php
-public/images/*
-!public/images/default.jpg
-.idea
-public/.php_cs
-public/.php_cs.chache

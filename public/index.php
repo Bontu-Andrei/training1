@@ -18,9 +18,10 @@ if (count($idsProductsInCart) > 0) {
     $stmt->execute();
     $productsNotInCart = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
 ?>
 
-<?php require_once 'includes/header.php'; ?>
+<?php require_once 'includes/header.php' ?>
 
 <h2><?= trans('Products who does not exist in the cart') ?></h2>
 

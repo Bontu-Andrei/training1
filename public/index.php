@@ -50,6 +50,6 @@ if (count($idsProductsInCart) > 0) {
     </div>
 <?php endforeach; ?>
 
-<?php require_once 'includes/footer.php'; ?>
+<?php require_once 'includes/footer.php' ?>
 
 

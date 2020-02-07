@@ -21,35 +21,35 @@ if (count($idsProductsInCart) > 0) {
 
 ?>
 
-<?php require_once 'includes/header.php' ?>
+<?php require_once 'includes/header.php'; ?>
 
-<h2><?= trans('Products who does not exist in the cart') ?></h2>
+<h2><?= trans('Products who does not exist in the cart'); ?></h2>
 
 <?php foreach ($productsNotInCart as $productNotInCart) : ?>
     <div style="border: 1px solid black; width: 600px; height: 120px; margin: 10px; display: flex;
                                  align-items: center; justify-content: space-evenly;">
 
-        <img src="<?= getImagePath($productNotInCart) ?>" alt="<?= trans('product_image') ?>"
+        <img src="<?= getImagePath($productNotInCart); ?>" alt="<?= trans('product_image'); ?>"
              style="width: 100px; height: 100px;">
 
         <div>
-            <span><b><?= trans('Title:') ?></b></span>
-            <span><?= $productNotInCart['title'] ?></span> <br>
+            <span><b><?= trans('Title:'); ?></b></span>
+            <span><?= $productNotInCart['title']; ?></span> <br>
 
-            <span><b><?= trans('Description:') ?></b></span>
-            <span><?= $productNotInCart['description'] ?></span> <br>
+            <span><b><?= trans('Description:'); ?></b></span>
+            <span><?= $productNotInCart['description']; ?></span> <br>
 
-            <span><b><?= trans('Price:') ?></b></span>
-            <span><?= $productNotInCart['price'] ?></span> <br>
+            <span><b><?= trans('Price:'); ?></b></span>
+            <span><?= $productNotInCart['price']; ?></span> <br>
         </div>
 
         <form action="cart.php" method="POST">
-            <input type="hidden" value="<?= $productNotInCart['id'] ?>" name="product_id">
-            <button type="submit"><?= trans('Add to cart') ?></button>
+            <input type="hidden" value="<?= $productNotInCart['id']; ?>" name="product_id">
+            <button type="submit"><?= trans('Add to cart'); ?></button>
         </form>
     </div>
 <?php endforeach; ?>
 
-<?php require_once 'includes/footer.php' ?>
+<?php require_once 'includes/footer.php'; ?>
 
 

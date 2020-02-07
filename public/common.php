@@ -36,20 +36,6 @@ function getAllProductsFromCart() {
     return $products;
 }
 
-function getAllProductsFromCartIds() {
-    if (isset($_SESSION['cart'])) {
-        $ids = [];
-
-        foreach ($_SESSION['cart'] as $id) {
-            $ids[] = (int) $id;
-        }
-
-        return $ids;
-    }
-
-    return array();
-}
-
 function getImagePath($product) {
     if ($product['image_path']) {
         return '/images/' . $product['image_path'];

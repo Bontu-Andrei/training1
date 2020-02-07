@@ -4,20 +4,30 @@ require_once 'common.php';
 
 $pdo = pdoConnectMysql();
 
-$idsProductsInCart = getAllProductsFromCartIds();
+if (isset($_SESSION['cart'])) {
+    $ids = [];
+
+    foreach ($_SESSION['cart'] as $id) {
+        $ids[] = (int) $id;
+    }
+
+    $idsProductsInCart = $ids;
+} else {
+    $idsProductsInCart = [];
+}
 
 if (count($idsProductsInCart) > 0) {
     $in = implode(',', array_fill(0, count($idsProductsInCart), '?'));
 
     $stmt = $pdo->prepare("SELECT * FROM products WHERE id NOT IN ($in)");
     $stmt->execute($idsProductsInCart);
-    $productsNotInCart = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } else {
     //Fetch all products because we don't have any products in cart
     $stmt = $pdo->prepare('SELECT * FROM products');
     $stmt->execute();
-    $productsNotInCart = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
+$productsNotInCart = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 

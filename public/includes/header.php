@@ -1,10 +1,3 @@
-<?php
-$h1 = trans('Training');
-$index = trans('Index');
-$cart = trans('Cart');
-$products = trans('Products');
-?>
-<?=<<<EOT
 <!DOCTYPE html>
 <html>
 <head>
@@ -14,15 +7,14 @@ $products = trans('Products');
 <body>
 <header>
     <div style="text-align: center">
-        <h1>$h1</h1>
+        <h1><?= trans('Training') ?></h1>
         <nav>
-            <a href="index.php">$index</a>
-            <a href="cart.php">$cart</a>
-            <a href="products.php">$products</a>
+            <a href="index.php"><?= trans('Index') ?></a>
+            <a href="cart.php"><?= trans('Cart') ?></a>
+            <a href="products.php"><?= trans('Products') ?></a>
         </nav>
     </div>
 </header>
 <main>
-EOT;
-?>
+
 

@@ -1,10 +1,8 @@
 <?php
 $h1 = trans('Training');
-$namePages = [
-    'index' => trans('Index'),
-    'cart' => trans('Cart'),
-    'products' => trans('Products')
-];
+$index = trans('Index');
+$cart = trans('Cart');
+$products = trans('Products');
 ?>
 <?=<<<EOT
 <!DOCTYPE html>
@@ -18,9 +16,9 @@ $namePages = [
     <div style="text-align: center">
         <h1>$h1</h1>
         <nav>
-            <a href="index.php">Index</a>
-            <a href="cart.php">Cart</a>
-            <a href="products.php">Products</a>
+            <a href="index.php">$index</a>
+            <a href="cart.php">$cart</a>
+            <a href="products.php">$products</a>
         </nav>
     </div>
 </header>

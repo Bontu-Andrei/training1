@@ -8,7 +8,7 @@ $products = getAllProductsFromCart();
 
 //Add To Cart
 if (isset($_POST['product_id']) && is_numeric($_POST['product_id'])) {
-    $product_id = (int) $_POST['product_id'];
+    $product_id = (int)$_POST['product_id'];
 
     $stmt = $pdo->prepare('SELECT * FROM products WHERE id = ?');
     $stmt->execute([$product_id]);
@@ -35,7 +35,7 @@ if (isset($_POST['product_id']) && is_numeric($_POST['product_id'])) {
 if (isset($_POST['product_id_to_remove'])) {
     if (is_numeric($_POST['product_id_to_remove']) && count($_SESSION['cart']) > 0) {
         foreach ($_SESSION['cart'] as $index => $productInCartId) {
-            if ((int) $productInCartId === (int) $_POST['product_id_to_remove']) {
+            if ((int)$productInCartId === (int)$_POST['product_id_to_remove']) {
                 unset($_SESSION['cart'][$index]);
 
                 header('Location: cart.php');

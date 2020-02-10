@@ -2,8 +2,6 @@
 
 require_once 'common.php';
 
-//$pdo = pdoConnectMysql();
-
 if (isset($_POST['checkout'])) {
     $products = getAllProductsFromCart();
 

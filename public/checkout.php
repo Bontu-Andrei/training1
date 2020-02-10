@@ -3,9 +3,8 @@
 require_once 'common.php';
 
 if (isset($_POST['checkout'])) {
-
-    $headers = 'MIME-Version: 1.0' . "\r\n";
-    $headers .= 'Content-Type: text/html; charset=ISO-8859-1' . "\r\n";
+    $headers = 'MIME-Version: 1.0'."\r\n";
+    $headers .= 'Content-Type: text/html; charset=ISO-8859-1'."\r\n";
     $subject = 'Checkout Order';
 
     $to = SHOP_MANAGER_EMAIL;

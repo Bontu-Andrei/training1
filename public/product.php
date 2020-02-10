@@ -1,10 +1,10 @@
 <?php
 
-require_once "common.php";
+require_once 'common.php';
 
-if (!$_SESSION["logged_in"]) {
+if (!$_SESSION['logged_in']) {
     // not auth so we redirect.
-    header("Location: login.php");
+    header('Location: login.php');
     exit();
 }
 
@@ -41,10 +41,10 @@ if (count($_POST) > 0) {
             $_SESSION['errors']['error'] = $response['error'];
         } else {
             $data = [
-                "title" => strip_tags($_POST["title"]),
-                "description" => strip_tags($_POST["description"]),
-                "price" => strip_tags($_POST["price"]),
-                "image_path" => strip_tags($response["filename"]),
+                'title' => strip_tags($_POST['title']),
+                'description' => strip_tags($_POST['description']),
+                'price' => strip_tags($_POST['price']),
+                'image_path' => strip_tags($response['filename']),
             ];
 
             $sql = 'INSERT INTO products (title, description, price, image_path) VALUES (:title, :description, :price, :image_path)';
@@ -53,15 +53,15 @@ if (count($_POST) > 0) {
 
             $stmt->execute($data);
 
-            header("Location: products.php");
+            header('Location: products.php');
             exit();
         }
     }
 }
 ?>
 
-<?php require_once "includes/header.php"; ?>
+<?php require_once 'includes/header.php'; ?>
 
-<?php require_once "includes/product-form.php"; ?>
+<?php require_once 'includes/product-form.php'; ?>
 
-<?php require_once "includes/footer.php"; ?>
+<?php require_once 'includes/footer.php'; ?>

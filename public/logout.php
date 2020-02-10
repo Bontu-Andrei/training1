@@ -1,8 +1,8 @@
 <?php
 
-require_once "common.php";
+require_once 'common.php';
 
-unset($_SESSION["logged_in"]);
+unset($_SESSION['logged_in']);
 
-header("Location: login.php");
+header('Location: login.php');
 exit();

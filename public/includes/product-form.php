@@ -2,7 +2,7 @@
     <form action="<?= $_SERVER['PHP_SELF'] ?>" method="POST" enctype="multipart/form-data">
         <div>
             <div>
-                <label style="font-size: 17px;" for="title">Title</label>
+                <label style="font-size: 17px;" for="title"><?= trans('Title'); ?></label>
             </div>
             <div>
                 <input style="margin-bottom: 10px;"
@@ -19,7 +19,7 @@
 
         <div>
             <div>
-                <label style="font-size: 17px;" for="description">Description</label>
+                <label style="font-size: 17px;" for="description"><?= trans('Description'); ?></label>
             </div>
             <div>
                 <input style="margin-bottom: 10px;"
@@ -36,7 +36,7 @@
 
         <div>
             <div>
-                <label style="font-size: 17px;" for="price">Price</label>
+                <label style="font-size: 17px;" for="price"><?= trans('Price'); ?></label>
             </div>
             <div>
                 <input style="margin-bottom: 10px;"
@@ -44,7 +44,7 @@
                        name="price"
                        id="price"
                        placeholder="<?= trans("Price") ?>"
-                       value="<?= isset($_POST['price']) ? $_POST['price'] : ''; ?>" > <br>
+                       value="<?= isset($_POST['price']) ? $_POST['price'] : ''; ?>"> <br>
             </div>
             <div style="color: red;">
                 <?= isset($_SESSION['errors']['price']) ? $_SESSION['errors']['price'] : '' ?>
@@ -53,7 +53,7 @@
 
         <div>
             <div>
-                <label for="image_file"> Image </label>
+                <label for="image_file"><?= trans('Image'); ?></label>
             </div>
 
             <div>

@@ -21,7 +21,7 @@ $data = [
 </head>
 <body>
 
-<h1><?= trans('Thanks for your order, ') . $data['customer_name'] ?></h1>
+<h1><?= trans('Thanks for your order, ').$data['customer_name']; ?></h1>
 
 <?php foreach ($products as $product) : ?>
     <table cellspacing="0" style="border: 2px dashed #FB4314; width: 50%;">
@@ -47,9 +47,9 @@ $data = [
     </table>
 <?php endforeach; ?>
 
-<h3><?= trans('Contact details: ') . $data['customer_details'] ?></h3>
-<h3><?= trans('Comments: ') . $data['customer_comments'] ?></h3>
-<h3><?= trans('Created at: ') . $data['creation_date'] ?></h3>
+<h3><?= trans('Contact details: ').$data['customer_details']; ?></h3>
+<h3><?= trans('Comments: ').$data['customer_comments']; ?></h3>
+<h3><?= trans('Created at: ').$data['creation_date']; ?></h3>
 
 </body>
 </html>

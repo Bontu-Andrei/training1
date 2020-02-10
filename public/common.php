@@ -103,7 +103,7 @@ function getImageEncoding($product) {
     $image = file_get_contents(__DIR__ . $path);
 
     if ($image !== false){
-        return 'data:image/jpg;base64,'.base64_encode($image);
+        return 'data:image/jpg;base64,' . base64_encode($image);
     }
 
     return '';

@@ -8,7 +8,7 @@ $products = getAllProductsFromCart();
 
 //Add To Cart
 if (isset($_POST['product_id']) && is_numeric($_POST['product_id'])) {
-    $product_id = (int)$_POST['product_id'];
+    $product_id = (int) $_POST['product_id'];
 
     $stmt = $pdo->prepare('SELECT * FROM products WHERE id = ?');
     $stmt->execute([$product_id]);

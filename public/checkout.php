@@ -3,16 +3,6 @@
 require_once 'common.php';
 
 if (isset($_POST['checkout'])) {
-    $products = getAllProductsFromCart();
-
-    $checkoutDate = date('Y-m-d H:i:s');
-
-    $data = [
-        'customer_name' => strip_tags($_POST['customer_name']),
-        'customer_details' => strip_tags($_POST['customer_details']),
-        'customer_comments' => strip_tags($_POST['customer_comments']),
-        'creation_date' => $checkoutDate,
-    ];
 
     $headers = 'MIME-Version: 1.0' . "\r\n";
     $headers .= 'Content-Type: text/html; charset=ISO-8859-1' . "\r\n";
@@ -21,44 +11,9 @@ if (isset($_POST['checkout'])) {
     $to = SHOP_MANAGER_EMAIL;
     $from = SHOP_MANAGER_EMAIL;
 
-    $htmlContent = '
-        <html> 
-        <head> 
-            <title>' . trans('Checkout') . '</title>
-        </head> 
-        <body> 
-            <h1>' . trans('Thanks for your order, ') . $data['customer_name'] . '</h1>';
-    foreach ($products as $product) {
-        $htmlContent .= '
-            <table cellspacing="0" style="border: 2px dashed #FB4314; width: 50%;">
-                <tr>
-                    <img src=' . getImageEncoding($product) . ' alt=' . trans('product_image') . '
-                        style="width: 100px; height: 100px;">
-                </tr>
-                
-                <tr>
-                    <th>' . trans('Title') . '</th>
-                    <td>' . $product['title'] . '</td>
-                </tr>
-                
-                <tr style="background-color: #e0e0e0;">
-                    <th>' . trans('Description') . '</th>
-                    <td>' . $product['description'] . '</td>
-                </tr>
-                
-                <tr>
-                    <th>' . trans('Price') . '</th>
-                    <td>' . $product['price'] . '</td>
-                </tr>
-            </table>';
-    }
-    $htmlContent .= '
-        <h3>' . trans('Contact details: ') . $data['customer_details'] . '</h3>
-        <h3>' . trans('Comments: ') . $data['customer_comments'] . '</h3>
-        <h3>'. trans('Created at: ') . $data['creation_date'] . '</h3>';
-
-    $htmlContent .= '</body>
-        </html>';
+    ob_start();
+    require_once 'content-email.php';
+    $htmlContent = ob_get_clean();
 
     // Send email
     if (mail($to, $subject, $htmlContent, $headers)) {
@@ -67,9 +22,3 @@ if (isset($_POST['checkout'])) {
         echo trans('Email sending failed.');
     }
 }
-
-
-
-
-
-

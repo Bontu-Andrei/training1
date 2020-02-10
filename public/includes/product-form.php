@@ -9,7 +9,7 @@
                        type="text"
                        name="title"
                        id="title"
-                       placeholder="<?= trans("Title") ?>"
+                       placeholder="<?= trans('Title') ?>"
                        value="<?= isset($_POST['title']) ? $_POST['title'] : ''; ?>"> <br>
             </div>
             <div style="color: red;">
@@ -26,7 +26,7 @@
                        type="text"
                        name="description"
                        id="description"
-                       placeholder="<?= trans("Description") ?>"
+                       placeholder="<?= trans('Description') ?>"
                        value="<?= isset($_POST['description']) ? $_POST['description'] : ''; ?>"> <br>
             </div>
             <div style="color: red;">
@@ -43,7 +43,7 @@
                        type="text"
                        name="price"
                        id="price"
-                       placeholder="<?= trans("Price") ?>"
+                       placeholder="<?= trans('Price') ?>"
                        value="<?= isset($_POST['price']) ? $_POST['price'] : ''; ?>"> <br>
             </div>
             <div style="color: red;">
@@ -69,8 +69,8 @@
             <?= isset($_SESSION['errors']['error']) ? $_SESSION['errors']['error'] : '' ?>
         </div>
 
-        <a href="products.php" style="font-size: large;"><?= trans("Products") ?></a>
+        <a href="products.php" style="font-size: large;"><?= trans('Products') ?></a>
 
-        <button type="submit" style="margin-left: 25%;"><?= trans("Save") ?></button>
+        <button type="submit" style="margin-left: 25%;"><?= trans('Save') ?></button>
     </form>
 </div>

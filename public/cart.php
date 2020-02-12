@@ -4,27 +4,35 @@ require_once 'common.php';
 
 $pdo = pdoConnectMysql();
 
-$products = getAllProductsFromCart();
+if (!isset($_SESSION['cart']) || !is_array($_SESSION['cart'])) {
+    $_SESSION['cart'] = [];
+}
+
+//List products from cart
+$productsInCart = $_SESSION['cart'];
+$products = [];
+
+if (count($productsInCart) > 0) {
+    $arrayToQuestionMarks = implode(',', array_fill(0, count($productsInCart), '?'));
+
+    $stmt = $pdo->prepare("SELECT * FROM products WHERE id IN ($arrayToQuestionMarks)");
+    // We only need the array keys, not the values, the keys are the id's of the products
+    $stmt->execute(array_values($productsInCart));
+    // Fetch the products from the database and return the result as an Array
+    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
 //Add To Cart
 if (isset($_POST['product_id']) && is_numeric($_POST['product_id'])) {
-    $product_id = (int) $_POST['product_id'];
+    $productId = (int) $_POST['product_id'];
 
     $stmt = $pdo->prepare('SELECT * FROM products WHERE id = ?');
-    $stmt->execute([$product_id]);
+    $stmt->execute([$productId]);
 
     $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Check if the product exists (array is not empty)
-    if (count($product) > 0) {
-        // Product exists in database, now we can create/update the session variable for the cart
-        if (isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
-            // Product is not in cart so add it
-            $_SESSION['cart'][] = $product_id;
-        } else {
-            // There are no products in cart, this will add the first product to cart
-            $_SESSION['cart'] = [$product_id];
-        }
+    if (!in_array($productId, $productsInCart)) {
+        $_SESSION['cart'][] = $productId;
     }
 
     header('Location: index.php');
@@ -32,15 +40,67 @@ if (isset($_POST['product_id']) && is_numeric($_POST['product_id'])) {
 }
 
 // Remove products from cart
-if (isset($_POST['product_id_to_remove'])) {
-    if (is_numeric($_POST['product_id_to_remove']) && count($_SESSION['cart']) > 0) {
-        foreach ($_SESSION['cart'] as $index => $productInCartId) {
-            if ((int)$productInCartId === (int)$_POST['product_id_to_remove']) {
-                unset($_SESSION['cart'][$index]);
+if (isset($_POST['product_id_to_remove']) && is_numeric($_POST['product_id_to_remove']) && count($_SESSION['cart']) > 0) {
+    foreach ($_SESSION['cart'] as $index => $productInCartId) {
+        if ((int) $productInCartId === (int) $_POST['product_id_to_remove']) {
+            unset($_SESSION['cart'][$index]);
 
-                header('Location: cart.php');
-                exit();
-            }
+            header('Location: cart.php');
+            exit();
+        }
+    }
+}
+
+//Checkout
+if (isset($_POST['checkout'])) {
+    $errors = [
+        'customer_name' => '',
+        'customer_details' => '',
+        'customer_comments' => '',
+    ];
+
+    if (!validateRequiredInput('customer_name')) {
+        $errors['customer_name'] = 'Name field is required.';
+    }
+
+    if (!validateRequiredInput('customer_details')) {
+        $errors['customer_details'] = 'Contact details field is required.';
+    }
+
+    if (!validateRequiredInput('customer_comments')) {
+        $errors['customer_comments'] = 'Comments field is required.';
+    }
+
+    if (!$errors['customer_name'] && !$errors['customer_details'] && !$errors['customer_comments']) {
+        $errors = [
+            'customer_name' => '',
+            'customer_details' => '',
+            'customer_comments' => '',
+        ];
+
+        $data = [
+            'customer_name' => strip_tags($_POST['customer_name']),
+            'customer_details' => strip_tags($_POST['customer_details']),
+            'customer_comments' => strip_tags($_POST['customer_comments']),
+            'creation_date' => date('Y-m-d H:i:s'),
+        ];
+
+        $subject = 'Checkout Order';
+
+        $headers = 'From: '.FROM_EMAIL."\r\n";
+        $headers .= "MIME-Version: 1.0\r\n";
+        $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+
+        ob_start();
+        require 'content-email.php';
+        $htmlContent = ob_get_clean();
+
+        // Send email
+        if (mail(TO_EMAIL, $subject, $htmlContent, $headers)) {
+            $_SESSION['cart'] = [];
+
+            header('Location: cart.php');
+            exit();
         }
     }
 }
@@ -79,17 +139,39 @@ if (isset($_POST['product_id_to_remove'])) {
     <?php endforeach; ?>
 
     <div style="margin: 30px;">
-        <form action="checkout.php" method="POST">
+        <form action="<?= $_SERVER['PHP_SELF']; ?>" method="POST">
             <div style="display: grid">
-                <textarea name="customer_name" cols="50" rows="2" placeholder="<?= trans('Name'); ?>"
-                          required></textarea> <br>
+                <input name="customer_name"
+                       placeholder="<?= trans('Name'); ?>"
+                       value="<?= isset($_POST['customer_name'])
+                           ? $_POST['customer_name']
+                           : ''; ?>">
 
-                <textarea name="customer_details" cols="50" rows="3" placeholder="<?= trans('Contact details'); ?>"
-                          required></textarea>
+                <div style="color: red">
+                    <?= isset($errors['customer_name']) ? $errors['customer_name'] : ''; ?>
+                </div>
+
                 <br>
 
-                <textarea name="customer_comments" cols="50" rows="4"
-                          placeholder="<?= trans('Comments'); ?>"></textarea> <br>
+                <input name="customer_details"
+                       placeholder="<?= trans('Contact details'); ?>"
+                       value="<?= isset($_POST['customer_details']) ? $_POST['customer_details'] : ''; ?>">
+
+                <div style="color: red;">
+                    <?= isset($errors['customer_details']) ? $errors['customer_details'] : ''; ?>
+                </div>
+
+                <br>
+
+                <input name="customer_comments"
+                       placeholder="<?= trans('Comments'); ?>"
+                       value="<?= isset($_POST['customer_comments']) ? $_POST['customer_comments'] : ''; ?>">
+
+                <div style="color: red;">
+                    <?= isset($errors['customer_comments']) ? $errors['customer_comments'] : ''; ?>
+                </div>
+
+                <br>
             </div>
 
             <div style="float: right;">

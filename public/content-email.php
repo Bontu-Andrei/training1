@@ -2,17 +2,6 @@
 
 require_once 'common.php';
 
-$products = getAllProductsFromCart();
-
-$checkoutDate = date('Y-m-d H:i:s');
-
-$data = [
-    'customer_name' => strip_tags($_POST['customer_name']),
-    'customer_details' => strip_tags($_POST['customer_details']),
-    'customer_comments' => strip_tags($_POST['customer_comments']),
-    'creation_date' => $checkoutDate,
-];
-
 ?>
 
 <html>

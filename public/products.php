@@ -39,7 +39,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <span><?= $product['price']; ?></span> <br>
             </div>
 
-            <a href="edit.php"><?= trans('Edit'); ?></a>
+            <a href="/edit.php?id=<?= $product['id']; ?>"><?= trans('Edit'); ?></a>
 
             <div>
                 <form action="delete.php" method="POST">

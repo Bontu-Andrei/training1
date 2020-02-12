@@ -8,4 +8,5 @@ define('DB_NAME', '');
 define('ADMIN_USERNAME', '');
 define('ADMIN_PASSWORD', '');
 
-define('SHOP_MANAGER_EMAIL', '');
+define('FROM_EMAIL', '');
+define('TO_EMAIL', '');

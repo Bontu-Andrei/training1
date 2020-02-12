@@ -155,7 +155,8 @@ if (isset($_POST['checkout'])) {
 
                 <input name="customer_details"
                        placeholder="<?= trans('Contact details'); ?>"
-                       value="<?= isset($_POST['customer_details']) ? $_POST['customer_details'] : ''; ?>">
+                       value="<?= isset($_POST['customer_details']) ? $_POST['customer_details'] : ''; ?>"
+                       style="height: 30px;">
 
                 <div style="color: red;">
                     <?= isset($errors['customer_details']) ? $errors['customer_details'] : ''; ?>
@@ -165,7 +166,8 @@ if (isset($_POST['checkout'])) {
 
                 <input name="customer_comments"
                        placeholder="<?= trans('Comments'); ?>"
-                       value="<?= isset($_POST['customer_comments']) ? $_POST['customer_comments'] : ''; ?>">
+                       value="<?= isset($_POST['customer_comments']) ? $_POST['customer_comments'] : ''; ?>"
+                       style="height: 40px;">
 
                 <div style="color: red;">
                     <?= isset($errors['customer_comments']) ? $errors['customer_comments'] : ''; ?>

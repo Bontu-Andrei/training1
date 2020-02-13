@@ -10,9 +10,21 @@ if (!$_SESSION['logged_in']) {
 
 $pdo = pdoConnectMysql();
 
+//List all products
 $stmt = $pdo->prepare('SELECT * FROM products');
 $stmt->execute();
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+//Delete products
+if (isset($_POST['product_id_to_remove'])) {
+    $id = (int) $_POST['product_id_to_remove'];
+
+    $stmt = $pdo->prepare('DELETE FROM products WHERE id = ?');
+    $stmt->execute([$id]);
+
+    header('Location: products.php');
+    exit();
+}
 
 ?>
 
@@ -42,7 +54,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <a href="/edit.php?id=<?= $product['id']; ?>"><?= trans('Edit'); ?></a>
 
             <div>
-                <form action="delete.php" method="POST">
+                <form action="<?= $_SERVER['PHP_SELF']; ?>" method="POST">
                     <input type="hidden" name="product_id_to_remove" value="<?= $product['id']; ?>">
 
                     <button type="submit"><?= trans('Remove'); ?></button>

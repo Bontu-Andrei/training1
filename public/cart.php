@@ -9,15 +9,14 @@ if (!isset($_SESSION['cart']) || !is_array($_SESSION['cart'])) {
 }
 
 //List products from cart
-$productsInCart = $_SESSION['cart'];
 $products = [];
 
-if (count($productsInCart) > 0) {
-    $arrayToQuestionMarks = implode(',', array_fill(0, count($productsInCart), '?'));
+if (count($_SESSION['cart']) > 0) {
+    $arrayToQuestionMarks = implode(',', array_fill(0, count($_SESSION['cart']), '?'));
 
     $stmt = $pdo->prepare("SELECT * FROM products WHERE id IN ($arrayToQuestionMarks)");
     // We only need the array keys, not the values, the keys are the id's of the products
-    $stmt->execute(array_values($productsInCart));
+    $stmt->execute(array_values($_SESSION['cart']));
     // Fetch the products from the database and return the result as an Array
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -31,7 +30,7 @@ if (isset($_POST['product_id']) && is_numeric($_POST['product_id'])) {
 
     $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!in_array($productId, $productsInCart)) {
+    if (!empty($product) && !in_array($productId, $_SESSION['cart'])) {
         $_SESSION['cart'][] = $productId;
     }
 
@@ -53,11 +52,7 @@ if (isset($_POST['product_id_to_remove']) && is_numeric($_POST['product_id_to_re
 
 //Checkout
 if (isset($_POST['checkout'])) {
-    $errors = [
-        'customer_name' => '',
-        'customer_details' => '',
-        'customer_comments' => '',
-    ];
+    $errors = [];
 
     if (!validateRequiredInput('customer_name')) {
         $errors['customer_name'] = 'Name field is required.';
@@ -71,11 +66,11 @@ if (isset($_POST['checkout'])) {
         $errors['customer_comments'] = 'Comments field is required.';
     }
 
-    if (!$errors['customer_name'] && !$errors['customer_details'] && !$errors['customer_comments']) {
-        $errors = [
-            'customer_name' => '',
-            'customer_details' => '',
-            'customer_comments' => '',
+    if (!$errors) {
+        $errors[] = [
+            'customer_name' => 'Name field is required.',
+            'customer_details' => 'Contact details field is required.',
+            'customer_comments' => 'Comments field is required.',
         ];
 
         $data = [
@@ -139,17 +134,17 @@ if (isset($_POST['checkout'])) {
     <?php endforeach; ?>
 
     <div style="margin: 30px;">
-        <form action="<?= $_SERVER['PHP_SELF']; ?>" method="POST">
+        <form action="cart.php" method="POST">
             <div style="display: grid">
                 <input name="customer_name"
                        placeholder="<?= trans('Name'); ?>"
-                       value="<?= isset($_POST['customer_name'])
-                           ? $_POST['customer_name']
-                           : ''; ?>">
+                       value="<?= isset($_POST['customer_name']) ? $_POST['customer_name'] : ''; ?>">
 
-                <div style="color: red">
-                    <?= isset($errors['customer_name']) ? $errors['customer_name'] : ''; ?>
-                </div>
+                <?php if (isset($errors['customer_name'])) : ?>
+                    <div style="color: red;">
+                        <?= $errors['customer_name']; ?>
+                    </div>
+                <?php endif; ?>
 
                 <br>
 
@@ -158,9 +153,11 @@ if (isset($_POST['checkout'])) {
                        value="<?= isset($_POST['customer_details']) ? $_POST['customer_details'] : ''; ?>"
                        style="height: 30px;">
 
-                <div style="color: red;">
-                    <?= isset($errors['customer_details']) ? $errors['customer_details'] : ''; ?>
-                </div>
+                <?php if (isset($errors['customer_details'])) : ?>
+                    <div style="color: red;">
+                        <?= $errors['customer_details']; ?>
+                    </div>
+                <?php endif; ?>
 
                 <br>
 
@@ -169,9 +166,11 @@ if (isset($_POST['checkout'])) {
                        value="<?= isset($_POST['customer_comments']) ? $_POST['customer_comments'] : ''; ?>"
                        style="height: 40px;">
 
-                <div style="color: red;">
-                    <?= isset($errors['customer_comments']) ? $errors['customer_comments'] : ''; ?>
-                </div>
+                <?php if (isset($errors['customer_comments'])) : ?>
+                    <div style="color: red;">
+                        <?= $errors['customer_comments']; ?>
+                    </div>
+                <?php endif; ?>
 
                 <br>
             </div>

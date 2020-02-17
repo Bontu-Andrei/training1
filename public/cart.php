@@ -67,12 +67,6 @@ if (isset($_POST['checkout'])) {
     }
 
     if (!$errors) {
-        $errors[] = [
-            'customer_name' => 'Name field is required.',
-            'customer_details' => 'Contact details field is required.',
-            'customer_comments' => 'Comments field is required.',
-        ];
-
         $data = [
             'customer_name' => strip_tags($_POST['customer_name']),
             'customer_details' => strip_tags($_POST['customer_details']),

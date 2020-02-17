@@ -20,7 +20,7 @@ if (count($_POST) > 0) {
         $editedProduct = getProductById($id);
 
         if (!$editedProduct) {
-            exit('Something went wrong');
+            exit('Something went wrong.');
         }
     } else {
         // Create request
@@ -32,15 +32,15 @@ if (count($_POST) > 0) {
 
     // Validation.
     if (!validateRequiredInput('title')) {
-        $errors['title'] = 'The title is required.';
+        $errors['title'] = 'Title field is required.';
     }
 
     if (!validateRequiredInput('description')) {
-        $errors['description'] = 'The description is required.';
+        $errors['description'] = 'Description field is required.';
     }
 
     if (!validateRequiredInput('price')) {
-        $errors['price'] = 'The price is required.';
+        $errors['price'] = 'Price field is required.';
     }
 
     if (!validateRequiredFileInput('image_file') && $action === 'create') {
@@ -80,7 +80,7 @@ if (count($_POST) > 0) {
             move_uploaded_file($fileTmpName, $fileDestination);
 
             $image_path = strip_tags($fileNameNew);
-        } else if ($action === 'edit') {
+        } elseif ($action === 'edit') {
             $image_path = $editedProduct['image_path'];
         }
 

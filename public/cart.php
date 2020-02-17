@@ -87,11 +87,31 @@ if (isset($_POST['checkout'])) {
         // Send email
         if (mail(TO_EMAIL, $subject, $htmlContent, $headers)) {
             $_SESSION['cart'] = [];
-
-            header('Location: cart.php');
-            exit();
         }
     }
+
+    // Create the order.
+    $stmt = $pdo->prepare('INSERT INTO orders (customer_name, customer_details, creation_date) VALUES  (?, ?, ?)');
+
+    $stmt->execute([
+        $data['customer_name'],
+        $data['customer_details'],
+        $data['creation_date'],
+    ]);
+
+    $orderId = $pdo->lastInsertId();
+
+    foreach ($products as $product) {
+        $stmt = $pdo->prepare('INSERT INTO order_products (order_id, product_id) VALUES (?, ?)');
+
+        $stmt->execute([
+            (int) $orderId,
+            (int) $product['id']
+        ]);
+    }
+
+    header('Location: cart.php');
+    exit();
 }
 
 ?>

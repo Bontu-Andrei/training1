@@ -2,6 +2,11 @@
 
 require_once 'common.php';
 
+if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']) {
+    header('Location: index.php');
+    exit();
+}
+
 if (isset($_POST['user']) && isset($_POST['password'])) {
     $errors = [];
 
@@ -20,11 +25,6 @@ if (isset($_POST['user']) && isset($_POST['password'])) {
         header('Location: products.php');
         exit();
     }
-}
-
-if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']) {
-    header('Location: index.php');
-    exit();
 }
 
 ?>

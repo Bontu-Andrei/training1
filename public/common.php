@@ -27,53 +27,6 @@ function getImagePath($product)
     }
 }
 
-function uploadImage()
-{
-    $file = $_FILES['image_file'];
-    $fileName = $file['name'];
-    $fileTmpName = $file['tmp_name'];
-    $fileSize = $file['size'];
-    $fileError = $file['error'];
-    $fileType = $file['type'];
-
-    $fileExt = explode('.', $fileName);
-    $fileActualExt = strtolower(end($fileExt));
-
-    $allowed = ['jpg', 'jpeg', 'png'];
-
-    if (!in_array($fileActualExt, $allowed)) {
-        return [
-            'success' => false,
-            'error' => 'You cannot upload files of this type!',
-        ];
-    }
-
-    if ($fileError !== 0) {
-        return [
-            'success' => false,
-            'error' => 'There was an error uploading your file!',
-        ];
-    }
-
-    if ($fileSize > 1000000) {
-        return [
-            'success' => false,
-            'error' => 'Your file is too big!',
-        ];
-    }
-
-    $fileNameNew = uniqid('', true).'.'.$fileActualExt;
-
-    $fileDestination = 'images/'.$fileNameNew;
-
-    move_uploaded_file($fileTmpName, $fileDestination);
-
-    return [
-        'success' => true,
-        'filename' => $fileNameNew,
-    ];
-}
-
 function validateRequiredInput($name)
 {
     return isset($_POST[$name]) && $_POST[$name];

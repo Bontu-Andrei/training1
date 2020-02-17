@@ -3,7 +3,6 @@
 require_once 'common.php';
 
 if (!$_SESSION['logged_in']) {
-    // not auth so we redirect.
     header('Location: login.php');
     exit();
 }
@@ -54,7 +53,7 @@ if (isset($_POST['product_id_to_remove'])) {
             <a href="/product.php?id=<?= $product['id']; ?>"><?= trans('Edit'); ?></a>
 
             <div>
-                <form action="<?= $_SERVER['PHP_SELF']; ?>" method="POST">
+                <form action="products.php" method="POST">
                     <input type="hidden" name="product_id_to_remove" value="<?= $product['id']; ?>">
 
                     <button type="submit"><?= trans('Remove'); ?></button>

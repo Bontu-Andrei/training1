@@ -9,60 +9,123 @@ if (!$_SESSION['logged_in']) {
 
 $pdo = pdoConnectMysql();
 
-//Add a new post
+// Handle POST request
 if (count($_POST) > 0) {
-    $_SESSION['errors'] = [];
+    $id = isset($_POST['id']) ? strip_tags($_POST['id']) : '';
+
+    if ($id) {
+        // Edit request
+        $action = 'edit';
+
+        $editedProduct = getProductById($id);
+
+        if (!$editedProduct) {
+            exit('Something went wrong');
+        }
+    } else {
+        // Create request
+        $action = 'create';
+        $editedProduct = null;
+    }
+
+    $errors = [];
 
     // Validation.
     if (!validateRequiredInput('title')) {
-        $_SESSION['errors']['title'] = 'The title is required.';
+        $errors['title'] = 'The title is required.';
     }
 
     if (!validateRequiredInput('description')) {
-        $_SESSION['errors']['description'] = 'The description is required.';
+        $errors['description'] = 'The description is required.';
     }
 
     if (!validateRequiredInput('price')) {
-        $_SESSION['errors']['price'] = 'The price is required.';
+        $errors['price'] = 'The price is required.';
     }
 
-    if (!validateRequiredFileInput('image_file')) {
-        $_SESSION['errors']['image_file'] = 'The image is required.';
+    if (!validateRequiredFileInput('image_file') && $action === 'create') {
+        $errors['image_file'] = 'The image is required.';
     }
 
-    if (count($_SESSION['errors']) === 0) {
-        $_SESSION['errors'] = [];
+    if (!$errors) {
+        if ($_FILES['image_file']['name'] != '') {
+            $file = $_FILES['image_file'];
+            $fileName = $file['name'];
+            $fileTmpName = $file['tmp_name'];
+            $fileSize = $file['size'];
+            $fileError = $file['error'];
+            $fileType = $file['type'];
 
-        $response = uploadImage();
+            $fileExt = explode('.', $fileName);
+            $fileActualExt = strtolower(end($fileExt));
 
-        if (!$response['success']) {
-            $_SESSION['errors']['error'] = $response['error'];
-        } else {
-            $data = [
-                'title' => strip_tags($_POST['title']),
-                'description' => strip_tags($_POST['description']),
-                'price' => strip_tags($_POST['price']),
-                'image_path' => strip_tags($response['filename']),
-            ];
+            $allowed = ['jpg', 'jpeg', 'png'];
 
-            $sql = 'INSERT INTO products (title, description, price, image_path) VALUES (?, ?, ?, ?)';
+            if (!in_array($fileActualExt, $allowed)) {
+                exit('You cannot upload files of this type!');
+            }
 
-            $stmt = $pdo->prepare($sql);
+            if ($fileError !== 0) {
+                exit('There was an error uploading your file!');
+            }
 
-            $stmt->execute([
-                $data['title'],
-                $data['description'],
-                $data['price'],
-                $data['image_path'],
-            ]);
+            if ($fileSize > 1000000) {
+                exit('Your file is too big!');
+            }
 
-            header('Location: products.php');
-            exit();
+            $fileNameNew = uniqid('', true).'.'.$fileActualExt;
+
+            $fileDestination = 'images/'.$fileNameNew;
+
+            move_uploaded_file($fileTmpName, $fileDestination);
+
+            $image_path = strip_tags($fileNameNew);
+        } else if ($action === 'edit') {
+            $image_path = $editedProduct['image_path'];
         }
+
+        $data = [
+            strip_tags($_POST['title']),
+            strip_tags($_POST['description']),
+            strip_tags($_POST['price']),
+            $image_path,
+        ];
+
+        if ($action === 'create') {
+            $sql = 'INSERT INTO products (title, description, price, image_path) VALUES (?, ?, ?, ?)';
+        } else {
+            $sql = 'UPDATE products SET title = ?, description = ?, price = ?, image_path = ? WHERE id = ?';
+        }
+
+        $stmt = $pdo->prepare($sql);
+
+        if ($action === 'edit') {
+            $data[] = (int) $id;
+        }
+
+        $stmt->execute($data);
+
+        header('Location: products.php');
+        exit();
+    }
+} else {
+    // Handle GET request
+    if (isset($_GET['id']) && !empty($_GET) && $_GET['id']) {
+        // EDIT product
+        $result = getProductById($_GET['id']);
+
+        if (!$result) {
+            exit('No product exists in our DB.');
+        }
+
+        $action = 'edit';
+        $editedProduct = $result;
+    } else {
+        // CREATE product
+        $action = 'create';
     }
 }
 
-$action = 'create';
 ?>
 
 <?php require_once 'includes/header.php'; ?>

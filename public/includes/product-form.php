@@ -17,7 +17,7 @@
                            : ($action === 'create' ? '' : $editedProduct['title']); ?>"> <br>
             </div>
             <div style="color: red;">
-                <?= isset($_SESSION['errors']['title']) ? $_SESSION['errors']['title'] : '' ?>
+                <?= isset($errors['title']) ? $errors['title'] : '' ?>
             </div>
         </div>
 
@@ -36,7 +36,7 @@
                            : ($action === 'create' ? '' : $editedProduct['description']); ?>"> <br>
             </div>
             <div style="color: red;">
-                <?= isset($_SESSION['errors']['description']) ? $_SESSION['errors']['description'] : '' ?>
+                <?= isset($errors['description']) ? $errors['description'] : '' ?>
             </div>
         </div>
 
@@ -55,7 +55,7 @@
                            : ($action === 'create' ? '' : $editedProduct['price']); ?>"> <br>
             </div>
             <div style="color: red;">
-                <?= isset($_SESSION['errors']['price']) ? $_SESSION['errors']['price'] : '' ?>
+                <?= isset($errors['price']) ? $errors['price'] : '' ?>
             </div>
         </div>
 
@@ -65,7 +65,7 @@
             </div>
 
             <?php if ($action === 'edit') : ?>
-                <img src="/images/<?= $editedProduct['image_path'] ? $editedProduct['image_path'] : 'default.jpg' ?>"
+                <img src="/images/<?= $editedProduct['image_path'] ?>"
                      alt="<?= trans('product_image') ?>"
                      style="width: 100px; height: 100px;">
             <?php endif; ?>
@@ -75,12 +75,12 @@
             </div>
 
             <div style="color: red;">
-                <?= isset($_SESSION['errors']['image_file']) ? $_SESSION['errors']['image_file'] : '' ?>
+                <?= isset($errors['image_file']) ? $errors['image_file'] : '' ?>
             </div>
         </div>
 
         <div style="color: red;">
-            <?= isset($_SESSION['errors']['error']) ? $_SESSION['errors']['error'] : '' ?>
+            <?= isset($errors['error']) ? $errors['error'] : '' ?>
         </div>
 
         <br>

@@ -51,7 +51,7 @@ if (isset($_POST['product_id_to_remove'])) {
                 <span><?= $product['price']; ?></span> <br>
             </div>
 
-            <a href="/edit.php?id=<?= $product['id']; ?>"><?= trans('Edit'); ?></a>
+            <a href="/product.php?id=<?= $product['id']; ?>"><?= trans('Edit'); ?></a>
 
             <div>
                 <form action="<?= $_SERVER['PHP_SELF']; ?>" method="POST">

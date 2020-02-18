@@ -2,7 +2,7 @@
 
 require_once 'common.php';
 
-if (!isset($_SESSION['logged_in']) && !$_SESSION['logged_in']) {
+if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
     header('Location: login.php');
     exit();
 }
@@ -11,19 +11,19 @@ $pdo = pdoConnectMysql();
 
 //Delete products
 if (isset($_POST['product_id_to_remove']) && $_POST['product_id_to_remove']) {
-    $id = (int) $_POST['product_id_to_remove'];
+    $id = (int)$_POST['product_id_to_remove'];
 
     $stmt = $pdo->prepare('DELETE FROM products WHERE id = ?');
     $stmt->execute([$id]);
 
     header('Location: products.php');
     exit();
-} else {
-    //List all products
-    $stmt = $pdo->prepare('SELECT * FROM products');
-    $stmt->execute();
-    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
+//List all products
+$stmt = $pdo->prepare('SELECT * FROM products');
+$stmt->execute();
+$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 

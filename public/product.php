@@ -203,7 +203,7 @@ if (count($_POST) > 0) {
             </div>
 
             <?php if ($action === 'edit') : ?>
-                <img src="/images/<?= $editedProduct['image_path']; ?>"
+                <img src="<?= getImagePath($editedProduct); ?>"
                      alt="<?= trans('product_image'); ?>"
                      style="width: 100px; height: 100px;">
             <?php endif; ?>

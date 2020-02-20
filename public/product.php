@@ -53,7 +53,7 @@ if (isset($_POST['save'])) {
         $errors['price'] = 'Price field is required.';
     }
 
-    if (!$_FILES['image_file']['size'] === 0 && !$_FILES['image_file']['error'] === 0 && $action === 'create') {
+    if (!validateRequiredFileInput('image_file') && $action === 'create') {
         $errors['image_file'] = 'The image is required.';
     }
 

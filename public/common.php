@@ -32,6 +32,11 @@ function validateRequiredInput($name)
     return isset($_POST[$name]) && $_POST[$name];
 }
 
+function validateRequiredFileInput($name)
+{
+    return $_FILES[$name]['size'] !== 0 && $_FILES[$name]['error'] === 0;
+}
+
 function getImageEncoding($product)
 {
     $path = getImagePath($product);

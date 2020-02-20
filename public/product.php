@@ -9,8 +9,15 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
 
 $pdo = pdoConnectMysql();
 
+$formValues = [
+    'title' => '',
+    'description' => '',
+    'price' => '',
+    'image_path',
+];
+
 // Handle POST request
-if (count($_POST) > 0) {
+if (isset($_POST['save'])) {
     $id = isset($_POST['id']) ? strip_tags($_POST['id']) : '';
 
     if ($id) {
@@ -19,12 +26,15 @@ if (count($_POST) > 0) {
 
         $editedProduct = getProductById($id);
 
+        $formValues = $editedProduct;
+
         if (!$editedProduct) {
             exit('Something went wrong.');
         }
     } else {
         // Create request
         $action = 'create';
+        $formValues = $_POST;
         $editedProduct = null;
     }
 
@@ -43,52 +53,46 @@ if (count($_POST) > 0) {
         $errors['price'] = 'Price field is required.';
     }
 
-    if (!validateRequiredFileInput('image_file') && $action === 'create') {
+    if (!$_FILES['image_file']['size'] === 0 && !$_FILES['image_file']['error'] === 0 && $action === 'create') {
         $errors['image_file'] = 'The image is required.';
+    }
+
+    if ($_FILES['image_file']['size'] > 1000000) {
+        $errors['image_size'] = 'Your image is too big.';
     }
 
     if (!$errors) {
         if ($_FILES['image_file']['name'] != '') {
             $file = $_FILES['image_file'];
-            $fileName = $file['name'];
-            $fileTmpName = $file['tmp_name'];
-            $fileSize = $file['size'];
-            $fileError = $file['error'];
-            $fileType = $file['type'];
 
-            $fileExt = explode('.', $fileName);
-            $fileActualExt = strtolower(end($fileExt));
+            $allowedTypes = ['image/jpeg', 'image/png'];
+            $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
+            $detectedType = finfo_file($fileInfo, $file['tmp_name']);
 
-            $allowed = ['jpg', 'jpeg', 'png'];
-
-            if (!in_array($fileActualExt, $allowed)) {
-                exit('You cannot upload files of this type!');
+            if (!in_array($detectedType, $allowedTypes)) {
+                exit('Please upload a valid image.');
             }
 
-            if ($fileError !== 0) {
-                exit('There was an error uploading your file!');
-            }
+            finfo_close($fileInfo);
 
-            if ($fileSize > 1000000) {
-                exit('Your file is too big!');
-            }
+            $fileExt = explode('.', $file['name']);
 
-            $fileNameNew = uniqid('', true).'.'.$fileActualExt;
+            $newFileName = round(microtime(true)).'.'.end($fileExt);
 
-            $fileDestination = 'images/'.$fileNameNew;
+            $fileDestination = 'images/'.$newFileName;
 
-            move_uploaded_file($fileTmpName, $fileDestination);
+            move_uploaded_file($file['tmp_name'], $fileDestination);
 
-            $image_path = strip_tags($fileNameNew);
+            $imagePath = strip_tags($newFileName);
         } elseif ($action === 'edit') {
-            $image_path = $editedProduct['image_path'];
+            $imagePath = $editedProduct['image_path'];
         }
 
         $data = [
             strip_tags($_POST['title']),
             strip_tags($_POST['description']),
             strip_tags($_POST['price']),
-            $image_path,
+            $imagePath,
         ];
 
         if ($action === 'create') {
@@ -110,16 +114,16 @@ if (count($_POST) > 0) {
     }
 } else {
     // Handle GET request
-    if (isset($_GET['id']) && !empty($_GET) && $_GET['id']) {
+    if (isset($_GET['id']) && $_GET['id']) {
         // EDIT product
-        $result = getProductById($_GET['id']);
 
-        if (!$result) {
+        if (!getProductById($_GET['id'])) {
             exit('No product exists in our DB.');
         }
 
         $action = 'edit';
-        $editedProduct = $result;
+        $editedProduct = getProductById($_GET['id']);
+        $formValues = $editedProduct;
     } else {
         // CREATE product
         $action = 'create';
@@ -132,8 +136,9 @@ if (count($_POST) > 0) {
 
 <div style="display: flex; justify-content: center; margin-top: 10px;">
     <form action="product.php" method="POST" enctype="multipart/form-data">
-        <?= $action === 'edit' ? '<input type="hidden" name="id" value="'.$editedProduct['id'].'">' : ''; ?>
-
+        <?php if ($action === 'edit') : ?>
+            <input type="hidden" name="id" value="<?= $editedProduct['id']; ?>">
+        <?php endif; ?>
         <div>
             <div>
                 <label style="font-size: 17px;" for="title"><?= trans('Title'); ?></label>
@@ -143,9 +148,7 @@ if (count($_POST) > 0) {
                        name="title"
                        id="title"
                        placeholder="<?= trans('Title'); ?>"
-                       value="<?= isset($_POST['title'])
-                           ? $_POST['title']
-                           : ($action === 'create' ? '' : $editedProduct['title']); ?>">
+                       value="<?= $formValues['title']; ?>">
             </div>
 
             <?php if (isset($errors['title'])) : ?>
@@ -164,9 +167,7 @@ if (count($_POST) > 0) {
                        name="description"
                        id="description"
                        placeholder="<?= trans('Description'); ?>"
-                       value="<?= isset($_POST['description'])
-                           ? $_POST['description']
-                           : ($action === 'create' ? '' : $editedProduct['description']); ?>">
+                       value="<?= $formValues['description']; ?>">
             </div>
 
             <?php if (isset($errors['description'])) : ?>
@@ -185,9 +186,7 @@ if (count($_POST) > 0) {
                        name="price"
                        id="price"
                        placeholder="<?= trans('Price'); ?>"
-                       value="<?= isset($_POST['price'])
-                           ? $_POST['price']
-                           : ($action === 'create' ? '' : $editedProduct['price']); ?>">
+                       value="<?= $formValues['price']; ?>">
             </div>
 
             <?php if (isset($errors['price'])) : ?>
@@ -217,18 +216,16 @@ if (count($_POST) > 0) {
                 <div style="color: red;">
                     <?= $errors['image_file']; ?>
                 </div>
+            <?php elseif (isset($errors['image_size'])) : ?>
+                <div style="color: red;">
+                    <?= $errors['image_size']; ?>
+                </div>
             <?php endif; ?>
         </div>
 
-        <?php if (isset($errors['error'])) : ?>
-            <div style="color: red;">
-                <?= $errors['error']; ?>
-            </div>
-        <?php endif; ?>
-
         <a href="products.php" style="font-size: large;"><?= trans('Products'); ?></a>
 
-        <button type="submit" style="margin-left: 25%;"><?= trans('Save'); ?></button>
+        <button type="submit" name="save" style="margin-left: 25%;"><?= trans('Save'); ?></button>
     </form>
 </div>
 

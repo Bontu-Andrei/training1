@@ -32,11 +32,6 @@ function validateRequiredInput($name)
     return isset($_POST[$name]) && $_POST[$name];
 }
 
-function validateRequiredFileInput($name)
-{
-    return $_FILES[$name]['size'] !== 0 && $_FILES[$name]['error'] === 0;
-}
-
 function getImageEncoding($product)
 {
     $path = getImagePath($product);
@@ -57,11 +52,11 @@ function getProductById($productId)
     // Fetch the product from the DB.
     $stmt = $pdo->prepare('SELECT * FROM products WHERE id = ?');
     $stmt->execute([$productId]);
-    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$result || count($result) === 0) {
         return null;
     }
 
-    return $result[0];
+    return $result;
 }

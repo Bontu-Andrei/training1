@@ -13,7 +13,6 @@ $formValues = [
     'title' => '',
     'description' => '',
     'price' => '',
-    'image_path',
 ];
 
 // Handle POST request

@@ -59,7 +59,7 @@ function getProductById($productId)
     $stmt->execute([$productId]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!$result || count($result) === 0) {
+    if (empty($result)) {
         return null;
     }
 

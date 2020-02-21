@@ -25,16 +25,19 @@ if (isset($_POST['save'])) {
 
         $editedProduct = getProductById($id);
 
-        $formValues = $editedProduct;
-
         if (!$editedProduct) {
             exit('Something went wrong.');
         }
     } else {
         // Create request
         $action = 'create';
-        $formValues = $_POST;
         $editedProduct = null;
+    }
+
+    if (count($_POST)) {
+        $formValues = $_POST;
+    } elseif ($action === 'edit') {
+        $formValues = $editedProduct;
     }
 
     $errors = [];
@@ -56,33 +59,35 @@ if (isset($_POST['save'])) {
         $errors['image_file'] = 'The image is required.';
     }
 
-    if ($_FILES['image_file']['size'] > 1000000) {
+    if ($_FILES['image_file']['size'] > 1000000 && $action === 'create') {
         $errors['image_size'] = 'Your image is too big.';
+    }
+
+    if ($_FILES['image_file']['type'] && $action === 'create') {
+        $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
+        $detectedType = finfo_file($fileInfo, $_FILES['image_file']['tmp_name']);
+        finfo_close($fileInfo);
+
+        if (!in_array($detectedType, ['image/jpeg', 'image/png'])) {
+            $errors['image_file'] = 'Please upload a valid image.';
+        }
     }
 
     if (!$errors) {
         if ($_FILES['image_file']['name'] != '') {
             $file = $_FILES['image_file'];
 
-            $allowedTypes = ['image/jpeg', 'image/png'];
-            $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
-            $detectedType = finfo_file($fileInfo, $file['tmp_name']);
+            $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
 
-            if (!in_array($detectedType, $allowedTypes)) {
-                exit('Please upload a valid image.');
+            if ($extension == 'jpeg' || $extension == 'jpg' || $extension == 'png') {
+                $newFileName = round(microtime(true)).'.'.$extension;
             }
-
-            finfo_close($fileInfo);
-
-            $fileExt = explode('.', $file['name']);
-
-            $newFileName = round(microtime(true)).'.'.end($fileExt);
 
             $fileDestination = 'images/'.$newFileName;
 
             move_uploaded_file($file['tmp_name'], $fileDestination);
 
-            $imagePath = strip_tags($newFileName);
+            $imagePath = $newFileName;
         } elseif ($action === 'edit') {
             $imagePath = $editedProduct['image_path'];
         }

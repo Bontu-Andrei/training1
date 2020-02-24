@@ -84,9 +84,9 @@ if (isset($_POST['save'])) {
                 $newFileName = round(microtime(true)).'.'.$extension;
 
                 move_uploaded_file($_FILES['image_file']['tmp_name'], 'images/'.$newFileName);
-            }
 
-            $imagePath = $newFileName;
+                $imagePath = $newFileName;
+            }
         } elseif ($action === 'edit') {
             $imagePath = $editedProduct['image_path'];
         }

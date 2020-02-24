@@ -55,37 +55,36 @@ if (isset($_POST['save'])) {
         $errors['price'] = 'Price field is required.';
     }
 
-    if (!validateRequiredFileInput('image_file') && $action === 'create') {
-        $errors['image_file'] = 'The image is required.';
-    }
+    if ($action === 'create') {
+       if (!validateRequiredFileInput('image_file')) {
+           $errors['image_file'] = 'The image is required.';
+       }
 
-    if ($_FILES['image_file']['size'] > 1000000 && $action === 'create') {
-        $errors['image_size'] = 'Your image is too big.';
-    }
+       if ($_FILES['image_file']['size'] > 1000000) {
+           $errors['image_size'] = 'Your image is too big.';
+       }
 
-    if ($_FILES['image_file']['type'] && $action === 'create') {
-        $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
-        $detectedType = finfo_file($fileInfo, $_FILES['image_file']['tmp_name']);
-        finfo_close($fileInfo);
+       if ($_FILES['image_file']['type']) {
+           $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
+           $detectedType = finfo_file($fileInfo, $_FILES['image_file']['tmp_name']);
+           finfo_close($fileInfo);
 
-        if (!in_array($detectedType, ['image/jpeg', 'image/png'])) {
-            $errors['image_file'] = 'Please upload a valid image.';
-        }
+           if (!in_array($detectedType, ['image/jpeg', 'image/png'])) {
+               $errors['image_file'] = 'Please upload a valid image.';
+           }
+       }
     }
 
     if (!$errors) {
         if ($_FILES['image_file']['name'] != '') {
-            $file = $_FILES['image_file'];
 
-            $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            $extension = strtolower(pathinfo($_FILES['image_file']['name'], PATHINFO_EXTENSION));
 
             if ($extension == 'jpeg' || $extension == 'jpg' || $extension == 'png') {
                 $newFileName = round(microtime(true)).'.'.$extension;
+
+                move_uploaded_file($_FILES['image_file']['tmp_name'], 'images/'.$newFileName);
             }
-
-            $fileDestination = 'images/'.$newFileName;
-
-            move_uploaded_file($file['tmp_name'], $fileDestination);
 
             $imagePath = $newFileName;
         } elseif ($action === 'edit') {
@@ -214,7 +213,6 @@ if (isset($_POST['save'])) {
             <div>
                 <input type="file" name="image_file" id="image_file">
             </div>
-
 
             <?php if (isset($errors['image_file'])) : ?>
                 <div style="color: red;">

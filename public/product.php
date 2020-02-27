@@ -55,37 +55,34 @@ if (isset($_POST['save'])) {
         $errors['price'] = 'Price field is required.';
     }
 
-    if ($action === 'create') {
-       if (!validateRequiredFileInput('image_file')) {
-           $errors['image_file'] = 'The image is required.';
-       }
+    if ($action === 'create' || file_exists($_FILES['image_file']['tmp_name'])) {
+        if (!validateRequiredFileInput('image_file')) {
+            $errors['image_file'] = 'The image is required.';
+        }
 
-       if ($_FILES['image_file']['size'] > 1000000) {
-           $errors['image_size'] = 'Your image is too big.';
-       }
+        if ($_FILES['image_file']['size'] > 1000000) {
+            $errors['image_size'] = 'Your image is too big.';
+        }
 
-       if ($_FILES['image_file']['type']) {
-           $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
-           $detectedType = finfo_file($fileInfo, $_FILES['image_file']['tmp_name']);
-           finfo_close($fileInfo);
+        if ($_FILES['image_file']) {
+            $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
+            $detectedType = finfo_file($fileInfo, $_FILES['image_file']['tmp_name']);
+            finfo_close($fileInfo);
 
-           if (!in_array($detectedType, ['image/jpeg', 'image/png'])) {
-               $errors['image_file'] = 'Please upload a valid image.';
-           }
-       }
+            if (!in_array($detectedType, ['image/jpeg', 'image/png'])) {
+                $errors['image_file'] = 'Please upload a valid image.';
+            }
+        }
     }
 
     if (!$errors) {
         if ($_FILES['image_file']['name'] != '') {
+            $extension = mime_content_type($_FILES['image_file']['tmp_name']);
 
-            $extension = strtolower(pathinfo($_FILES['image_file']['name'], PATHINFO_EXTENSION));
+            if ($extension == 'image/jpeg' || $extension == 'image/png') {
+                $imagePath = round(microtime(true)).'.'.substr(strrchr($extension, '/'), 1);
 
-            if ($extension == 'jpeg' || $extension == 'jpg' || $extension == 'png') {
-                $newFileName = round(microtime(true)).'.'.$extension;
-
-                move_uploaded_file($_FILES['image_file']['tmp_name'], 'images/'.$newFileName);
-
-                $imagePath = $newFileName;
+                move_uploaded_file($_FILES['image_file']['tmp_name'], 'images/'.$imagePath);
             }
         } elseif ($action === 'edit') {
             $imagePath = $editedProduct['image_path'];
@@ -137,98 +134,98 @@ if (isset($_POST['save'])) {
 
 <?php require_once 'includes/header.php'; ?>
 
-<div style="display: flex; justify-content: center; margin-top: 10px;">
-    <form action="product.php" method="POST" enctype="multipart/form-data">
-        <?php if ($action === 'edit') : ?>
-            <input type="hidden" name="id" value="<?= $editedProduct['id']; ?>">
-        <?php endif; ?>
-        <div>
-            <div>
-                <label style="font-size: 17px;" for="title"><?= trans('Title'); ?></label>
-            </div>
-            <div>
-                <input type="text"
-                       name="title"
-                       id="title"
-                       placeholder="<?= trans('Title'); ?>"
-                       value="<?= $formValues['title']; ?>">
-            </div>
-
-            <?php if (isset($errors['title'])) : ?>
-                <div style="color: red;">
-                    <?= $errors['title']; ?>
-                </div>
-            <?php endif; ?>
-        </div>
-
-        <div>
-            <div>
-                <label style="font-size: 17px;" for="description"><?= trans('Description'); ?></label>
-            </div>
-            <div>
-                <input type="text"
-                       name="description"
-                       id="description"
-                       placeholder="<?= trans('Description'); ?>"
-                       value="<?= $formValues['description']; ?>">
-            </div>
-
-            <?php if (isset($errors['description'])) : ?>
-                <div style="color: red;">
-                    <?= $errors['description']; ?>
-                </div>
-            <?php endif; ?>
-        </div>
-
-        <div>
-            <div>
-                <label style="font-size: 17px;" for="price"><?= trans('Price'); ?></label>
-            </div>
-            <div>
-                <input type="text"
-                       name="price"
-                       id="price"
-                       placeholder="<?= trans('Price'); ?>"
-                       value="<?= $formValues['price']; ?>">
-            </div>
-
-            <?php if (isset($errors['price'])) : ?>
-                <div style="color: red;">
-                    <?= $errors['price']; ?>
-                </div>
-            <?php endif; ?>
-        </div>
-
-        <div>
-            <div>
-                <label for="image_file"><?= trans('Image'); ?></label>
-            </div>
-
+    <div style="display: flex; justify-content: center; margin-top: 10px;">
+        <form action="product.php" method="POST" enctype="multipart/form-data">
             <?php if ($action === 'edit') : ?>
-                <img src="<?= getImagePath($editedProduct); ?>"
-                     alt="<?= trans('product_image'); ?>"
-                     style="width: 100px; height: 100px;">
+                <input type="hidden" name="id" value="<?= $editedProduct['id']; ?>">
             <?php endif; ?>
-
             <div>
-                <input type="file" name="image_file" id="image_file">
+                <div>
+                    <label style="font-size: 17px;" for="title"><?= trans('Title'); ?></label>
+                </div>
+                <div>
+                    <input type="text"
+                           name="title"
+                           id="title"
+                           placeholder="<?= trans('Title'); ?>"
+                           value="<?= $formValues['title']; ?>">
+                </div>
+
+                <?php if (isset($errors['title'])) : ?>
+                    <div style="color: red;">
+                        <?= $errors['title']; ?>
+                    </div>
+                <?php endif; ?>
             </div>
 
-            <?php if (isset($errors['image_file'])) : ?>
-                <div style="color: red;">
-                    <?= $errors['image_file']; ?>
+            <div>
+                <div>
+                    <label style="font-size: 17px;" for="description"><?= trans('Description'); ?></label>
                 </div>
-            <?php elseif (isset($errors['image_size'])) : ?>
-                <div style="color: red;">
-                    <?= $errors['image_size']; ?>
+                <div>
+                    <input type="text"
+                           name="description"
+                           id="description"
+                           placeholder="<?= trans('Description'); ?>"
+                           value="<?= $formValues['description']; ?>">
                 </div>
-            <?php endif; ?>
-        </div>
 
-        <a href="products.php" style="font-size: large;"><?= trans('Products'); ?></a>
+                <?php if (isset($errors['description'])) : ?>
+                    <div style="color: red;">
+                        <?= $errors['description']; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
 
-        <button type="submit" name="save" style="margin-left: 25%;"><?= trans('Save'); ?></button>
-    </form>
-</div>
+            <div>
+                <div>
+                    <label style="font-size: 17px;" for="price"><?= trans('Price'); ?></label>
+                </div>
+                <div>
+                    <input type="text"
+                           name="price"
+                           id="price"
+                           placeholder="<?= trans('Price'); ?>"
+                           value="<?= $formValues['price']; ?>">
+                </div>
+
+                <?php if (isset($errors['price'])) : ?>
+                    <div style="color: red;">
+                        <?= $errors['price']; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+
+            <div>
+                <div>
+                    <label for="image_file"><?= trans('Image'); ?></label>
+                </div>
+
+                <?php if ($action === 'edit') : ?>
+                    <img src="<?= getImagePath($editedProduct); ?>"
+                         alt="<?= trans('product_image'); ?>"
+                         style="width: 100px; height: 100px;">
+                <?php endif; ?>
+
+                <div>
+                    <input type="file" name="image_file" id="image_file">
+                </div>
+
+                <?php if (isset($errors['image_file'])) : ?>
+                    <div style="color: red;">
+                        <?= $errors['image_file']; ?>
+                    </div>
+                <?php elseif (isset($errors['image_size'])) : ?>
+                    <div style="color: red;">
+                        <?= $errors['image_size']; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+
+            <a href="products.php" style="font-size: large;"><?= trans('Products'); ?></a>
+
+            <button type="submit" name="save" style="margin-left: 25%;"><?= trans('Save'); ?></button>
+        </form>
+    </div>
 
 <?php require_once 'includes/footer.php'; ?>

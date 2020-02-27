@@ -64,7 +64,7 @@ if (isset($_POST['save'])) {
             $errors['image_size'] = 'Your image is too big.';
         }
 
-        if ($_FILES['image_file']) {
+        if ($_FILES['image_file']['tmp_name']) {
             $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
             $detectedType = finfo_file($fileInfo, $_FILES['image_file']['tmp_name']);
             finfo_close($fileInfo);

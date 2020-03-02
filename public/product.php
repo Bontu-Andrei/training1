@@ -77,6 +77,7 @@ if (isset($_POST['save'])) {
 
     if (!$errors) {
         if ($_FILES['image_file']['name'] != '') {
+
             $extension = mime_content_type($_FILES['image_file']['tmp_name']);
 
             if ($extension == 'image/jpeg' || $extension == 'image/png') {

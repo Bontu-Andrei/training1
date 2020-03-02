@@ -9,7 +9,8 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
 
 $pdo = pdoConnectMysql();
 
-$sql = 'SELECT o.id, o.customer_name, o.creation_date, o.customer_details, p.title, p.description, p.price, p.image_path
+$sql = 'SELECT o.id, o.customer_name, o.creation_date, o.customer_details, o.customer_comments, o.product_price_sum, 
+               p.title, p.description, p.price, p.image_path
         FROM orders AS o 
         INNER JOIN order_products AS op ON o.id = op.order_id 
         INNER JOIN products as p ON p.id = op.product_id';
@@ -25,7 +26,9 @@ foreach ($ordersResult as $orderItem) {
         $orders[$orderItem['id']] = [
             'customer_name' => $orderItem['customer_name'],
             'customer_details' => $orderItem['customer_details'],
+            'customer_comments' => $orderItem['customer_comments'],
             'creation_date' => $orderItem['creation_date'],
+            'product_price_sum' => $orderItem['product_price_sum'],
             'products' => [],
         ];
     }
@@ -58,6 +61,11 @@ foreach ($ordersResult as $orderItem) {
             </tr>
 
             <tr>
+                <th><?= trans('Customer Comments:'); ?></th>
+                <td><?= $order['customer_comments']; ?></td>
+            </tr>
+
+            <tr>
                 <th><?= trans('Order Date:'); ?></th>
                 <td><?= $order['creation_date']; ?></td>
             </tr>
@@ -70,11 +78,7 @@ foreach ($ordersResult as $orderItem) {
                 <th><?= trans('Image'); ?></th>
             </tr>
 
-            <?php $sum = 0; ?>
-
             <?php foreach ($order['products'] as $product) : ?>
-                <?php $sum += $product['price']; ?>
-
                 <tr>
                     <td><?= $product['title']; ?></td>
                     <td><?= $product['description']; ?></td>
@@ -85,7 +89,7 @@ foreach ($ordersResult as $orderItem) {
 
             <tr>
                 <th><?= trans('Total Price:'); ?></th>
-                <td><?= $sum; ?></td>
+                <td><?= $order['product_price_sum']; ?></td>
             </tr>
         </table>
     <?php endforeach; ?>

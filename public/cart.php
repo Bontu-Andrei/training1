@@ -67,11 +67,18 @@ if (isset($_POST['checkout'])) {
     }
 
     if (!$errors) {
+        $totalPrice = 0;
+
+        foreach ($products as $product) {
+            $totalPrice += $product['price'];
+        }
+
         $data = [
             'customer_name' => strip_tags($_POST['customer_name']),
             'customer_details' => strip_tags($_POST['customer_details']),
             'customer_comments' => strip_tags($_POST['customer_comments']),
             'creation_date' => date('Y-m-d H:i:s'),
+            'product_price_sum' => $totalPrice,
         ];
 
         $subject = 'Checkout Order';
@@ -91,12 +98,15 @@ if (isset($_POST['checkout'])) {
     }
 
     // Create the order.
-    $stmt = $pdo->prepare('INSERT INTO orders (customer_name, customer_details, creation_date) VALUES  (?, ?, ?)');
+    $stmt = $pdo->prepare('INSERT INTO orders (customer_name, customer_details, customer_comments, creation_date, 
+                           product_price_sum) VALUES  (?, ?, ?, ?, ?)');
 
     $stmt->execute([
         $data['customer_name'],
         $data['customer_details'],
+        $data['customer_comments'],
         $data['creation_date'],
+        $data['product_price_sum'],
     ]);
 
     $orderId = $pdo->lastInsertId();
@@ -106,7 +116,7 @@ if (isset($_POST['checkout'])) {
 
         $stmt->execute([
             (int) $orderId,
-            (int) $product['id']
+            (int) $product['id'],
         ]);
     }
 

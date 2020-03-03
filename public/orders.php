@@ -46,6 +46,11 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <th><?= trans('Total Price:'); ?></th>
                 <td><?= $order['product_price_sum']; ?></td>
             </tr>
+
+            <tr>
+                <th><?= trans('Order details:'); ?></th>
+                <td><a href="/order.php?id=<?= $order['id']; ?>"><?= trans('Order details'); ?></a></td>
+            </tr>
         </table>
     <?php endforeach; ?>
 </div>

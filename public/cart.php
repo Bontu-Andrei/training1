@@ -91,10 +91,10 @@ if (isset($_POST['checkout'])) {
         require 'content-email.php';
         $htmlContent = ob_get_clean();
 
-//        // Send email
-//        if (mail(TO_EMAIL, $subject, $htmlContent, $headers)) {
-//            $_SESSION['cart'] = [];
-//        }
+        // Send email
+        if (mail(TO_EMAIL, $subject, $htmlContent, $headers)) {
+            $_SESSION['cart'] = [];
+        }
     }
 
     // Create the order.

@@ -7,31 +7,33 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
     exit();
 }
 
-if (isset($_GET['id']) && is_numeric($_GET['id']) && !empty($_GET['id'])) {
-    $pdo = pdoConnectMysql();
+if (!isset($_GET['id']) && !is_numeric($_GET['id']) && empty($_GET['id'])) {
+    exit('Something went wrong.');
+}
 
-    $orderId = (int) $_GET['id'];
+$pdo = pdoConnectMysql();
 
-    $stmt = $pdo->prepare('SELECT * FROM orders WHERE id = ?');
-    $stmt->execute([$orderId]);
-    $order = $stmt->fetch(PDO::FETCH_ASSOC);
+$orderId = (int) $_GET['id'];
 
-    if (empty($order)) {
-        header('Location: orders.php');
-        exit();
-    }
+$stmt = $pdo->prepare('SELECT * FROM orders WHERE id = ?');
+$stmt->execute([$orderId]);
+$order = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $sql = 'SELECT * FROM products INNER JOIN order_product 
+if (empty($order)) {
+    header('Location: orders.php');
+    exit();
+}
+
+$sql = 'SELECT * FROM products INNER JOIN order_product 
             ON products.id = order_product.product_id 
             WHERE order_product.order_id = ?';
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$orderId]);
-    $orderProducts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt = $pdo->prepare($sql);
+$stmt->execute([$orderId]);
+$orderProducts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    if (empty($orderProducts)) {
-        header('Location: orders.php');
-        exit();
-    }
+if (empty($orderProducts)) {
+    header('Location: orders.php');
+    exit();
 }
 
 ?>

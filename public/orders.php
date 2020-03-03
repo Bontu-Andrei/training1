@@ -9,37 +9,9 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
 
 $pdo = pdoConnectMysql();
 
-$sql = 'SELECT o.id, o.customer_name, o.creation_date, o.customer_details, o.customer_comments, o.product_price_sum, 
-               p.title, p.description, p.price, p.image_path
-        FROM orders AS o 
-        INNER JOIN order_product AS op ON o.id = op.order_id 
-        INNER JOIN products as p ON p.id = op.product_id';
-
-$stmt = $pdo->prepare($sql);
+$stmt = $pdo->prepare('SELECT * FROM orders');
 $stmt->execute();
-$ordersResult = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-$orders = []; // The key is the id of the order.
-
-foreach ($ordersResult as $orderItem) {
-    if (!array_key_exists($orderItem['id'], $orders)) {
-        $orders[$orderItem['id']] = [
-            'customer_name' => $orderItem['customer_name'],
-            'customer_details' => $orderItem['customer_details'],
-            'customer_comments' => $orderItem['customer_comments'],
-            'creation_date' => $orderItem['creation_date'],
-            'product_price_sum' => $orderItem['product_price_sum'],
-            'products' => [],
-        ];
-    }
-
-    $orders[$orderItem['id']]['products'][] = [
-        'title' => $orderItem['title'],
-        'description' => $orderItem['description'],
-        'price' => $orderItem['price'],
-        'image_path' => $orderItem['image_path'],
-    ];
-}
+$orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
@@ -48,7 +20,7 @@ foreach ($ordersResult as $orderItem) {
 <h1 style="text-align: center"><?= trans('Orders'); ?></h1>
 
 <div style="display: grid; justify-content: center;">
-    <?php foreach ($orders as $orderId => $order) : ?>
+    <?php foreach ($orders as $order) : ?>
         <table style="text-align: center; margin-bottom: 30px; border: 1px solid black;">
             <tr>
                 <th><?= trans('Customer Name:'); ?></th>
@@ -69,23 +41,6 @@ foreach ($ordersResult as $orderItem) {
                 <th><?= trans('Order Date:'); ?></th>
                 <td><?= $order['creation_date']; ?></td>
             </tr>
-
-            <tr>
-                <th rowspan="<?= count($order['products']) + 1; ?>"><?= trans('Products:'); ?></th>
-                <th><?= trans('Title'); ?></th>
-                <th><?= trans('Description'); ?></th>
-                <th><?= trans('Price'); ?></th>
-                <th><?= trans('Image'); ?></th>
-            </tr>
-
-            <?php foreach ($order['products'] as $product) : ?>
-                <tr>
-                    <td><?= $product['title']; ?></td>
-                    <td><?= $product['description']; ?></td>
-                    <td><?= $product['price']; ?></td>
-                    <td><img src="<?= getImagePath($product); ?>" width="100" height="100"></td>
-                </tr>
-            <?php endforeach; ?>
 
             <tr>
                 <th><?= trans('Total Price:'); ?></th>

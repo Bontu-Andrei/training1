@@ -11,7 +11,7 @@ $pdo = pdoConnectMysql();
 
 //Delete products
 if (isset($_POST['product_id_to_remove']) && $_POST['product_id_to_remove']) {
-    $id = (int)$_POST['product_id_to_remove'];
+    $id = (int) $_POST['product_id_to_remove'];
 
     $stmt = $pdo->prepare('DELETE FROM products WHERE id = ?');
     $stmt->execute([$id]);

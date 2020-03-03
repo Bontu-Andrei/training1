@@ -7,44 +7,24 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
     exit();
 }
 
-if (isset($_GET['id']) && $_GET['id']) {
-
+if (isset($_GET['id']) && $_GET['id'] && !empty($_GET['id'])) {
     $pdo = pdoConnectMysql();
 
     $orderId = (int) $_GET['id'];
 
-    $sql = 'SELECT o.id, o.customer_name, o.creation_date, o.customer_details, o.customer_comments, o.product_price_sum, 
-               p.title, p.description, p.price, p.image_path
-        FROM orders AS o 
-        INNER JOIN order_product AS op ON o.id = op.order_id 
-        INNER JOIN products as p ON p.id = op.product_id 
-        WHERE o.id = ?';
-
-    $stmt = $pdo->prepare($sql);
+    $stmt = $pdo->prepare('SELECT * FROM orders WHERE id = ?');
     $stmt->execute([$orderId]);
     $ordersResult = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $orders = [];
-
-    foreach ($ordersResult as $orderItem) {
-        if (!array_key_exists($orderItem['id'], $orders)) {
-            $orders[$orderItem['id']] = [
-                'customer_name' => $orderItem['customer_name'],
-                'customer_details' => $orderItem['customer_details'],
-                'customer_comments' => $orderItem['customer_comments'],
-                'creation_date' => $orderItem['creation_date'],
-                'product_price_sum' => $orderItem['product_price_sum'],
-                'products' => [],
-            ];
-        }
-
-        $orders[$orderItem['id']]['products'][] = [
-            'title' => $orderItem['title'],
-            'description' => $orderItem['description'],
-            'price' => $orderItem['price'],
-            'image_path' => $orderItem['image_path'],
-        ];
-    }
+    $sql = 'SELECT * FROM products INNER JOIN order_product 
+            ON products.id = order_product.product_id 
+            WHERE order_product.order_id = ?';
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$orderId]);
+    $productsResult = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    header('Location: orders.php');
+    exit();
 }
 
 ?>
@@ -54,7 +34,7 @@ if (isset($_GET['id']) && $_GET['id']) {
 <h1 style="text-align: center"><?= trans('Order'); ?></h1>
 
 <div style="display: grid; justify-content: center;">
-    <?php foreach ($orders as $order) : ?>
+    <?php foreach ($ordersResult as $order) : ?>
         <table style="text-align: center; margin-bottom: 30px; border: 1px solid black;">
             <tr>
                 <th><?= trans('Customer Name:'); ?></th>
@@ -77,14 +57,14 @@ if (isset($_GET['id']) && $_GET['id']) {
             </tr>
 
             <tr>
-                <th rowspan="<?= count($order['products']) + 1; ?>"><?= trans('Products:'); ?></th>
+                <th rowspan="<?= count($productsResult) + 1; ?>"><?= trans('Products:'); ?></th>
                 <th><?= trans('Title'); ?></th>
                 <th><?= trans('Description'); ?></th>
                 <th><?= trans('Price'); ?></th>
                 <th><?= trans('Image'); ?></th>
             </tr>
 
-            <?php foreach ($order['products'] as $product) : ?>
+            <?php foreach ($productsResult as $product) : ?>
                 <tr>
                     <td><?= $product['title']; ?></td>
                     <td><?= $product['description']; ?></td>

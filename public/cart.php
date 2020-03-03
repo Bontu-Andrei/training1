@@ -112,7 +112,7 @@ if (isset($_POST['checkout'])) {
     $orderId = $pdo->lastInsertId();
 
     foreach ($products as $product) {
-        $stmt = $pdo->prepare('INSERT INTO order_products (order_id, product_id) VALUES (?, ?)');
+        $stmt = $pdo->prepare('INSERT INTO order_product (order_id, product_id) VALUES (?, ?)');
 
         $stmt->execute([
             (int) $orderId,

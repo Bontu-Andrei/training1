@@ -12,7 +12,7 @@ $pdo = pdoConnectMysql();
 $sql = 'SELECT o.id, o.customer_name, o.creation_date, o.customer_details, o.customer_comments, o.product_price_sum, 
                p.title, p.description, p.price, p.image_path
         FROM orders AS o 
-        INNER JOIN order_products AS op ON o.id = op.order_id 
+        INNER JOIN order_product AS op ON o.id = op.order_id 
         INNER JOIN products as p ON p.id = op.product_id';
 
 $stmt = $pdo->prepare($sql);

@@ -17,7 +17,8 @@ if (isset($_GET['id']) && is_numeric($_GET['id']) && !empty($_GET['id'])) {
     $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (empty($order)) {
-        exit('Order not found.');
+        header('Location: orders.php');
+        exit();
     }
 
     $sql = 'SELECT * FROM products INNER JOIN order_product 
@@ -28,7 +29,8 @@ if (isset($_GET['id']) && is_numeric($_GET['id']) && !empty($_GET['id'])) {
     $orderProducts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     if (empty($orderProducts)) {
-        exit('No products found.');
+        header('Location: orders.php');
+        exit();
     }
 }
 

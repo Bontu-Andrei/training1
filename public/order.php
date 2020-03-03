@@ -54,7 +54,7 @@ if (isset($_GET['id']) && $_GET['id']) {
 <h1 style="text-align: center"><?= trans('Order'); ?></h1>
 
 <div style="display: grid; justify-content: center;">
-    <?php foreach ($orders as $orderId => $order) : ?>
+    <?php foreach ($orders as $order) : ?>
         <table style="text-align: center; margin-bottom: 30px; border: 1px solid black;">
             <tr>
                 <th><?= trans('Customer Name:'); ?></th>

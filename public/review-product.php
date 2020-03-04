@@ -26,7 +26,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id']) && !empty($_GET['id'])) {
 if (isset($_POST['review'])) {
     $errors = [];
 
-    if (!isset($_POST['note'])) {
+    if (!validateRequiredInput('note')) {
         $errors['note'] = 'You are not selected any note.';
     }
 
@@ -74,7 +74,6 @@ if (isset($_POST['review_id_to_remove']) && $_POST['review_id_to_remove']) {
     header('Location: index.php');
     exit();
 }
-
 ?>
 
 <?php require_once 'includes/header.php'; ?>

@@ -57,6 +57,10 @@ $productsNotInCart = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <input type="hidden" value="<?= $productNotInCart['id']; ?>" name="product_id">
             <button type="submit"><?= trans('Add to cart'); ?></button>
         </form>
+
+        <div>
+            <a href="/review-product.php?id=<?= $productNotInCart['id'] ?>"><?= trans('Reviews'); ?></a>
+        </div>
     </div>
 <?php endforeach; ?>
 

@@ -35,7 +35,7 @@ if (isset($_POST['review'])) {
     }
 
     if (!validateRequiredInput('description')) {
-        $errors['password'] = 'Password field is required.';
+        $errors['description'] = 'Password field is required.';
     }
 
     if (!$errors) {

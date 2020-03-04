@@ -59,6 +59,11 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <button type="submit"><?= trans('Remove'); ?></button>
                 </form>
             </div>
+
+            <div>
+                <a href="/review-product.php?id=<?= $product['id'] ?>"><?= trans('Reviews'); ?></a>
+            </div>
+
         </div>
     <?php endforeach; ?>
 </div>

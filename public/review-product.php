@@ -59,10 +59,10 @@ if (isset($_POST['review'])) {
             (int) $productId,
             (int) $reviewId,
         ]);
-    }
 
-    header('Location: review-product.php?id='.$productId);
-    exit();
+        header('Location: review-product.php?id='.$productId);
+        exit();
+    }
 }
 
 if (isset($_POST['review_id_to_remove']) && $_POST['review_id_to_remove']) {

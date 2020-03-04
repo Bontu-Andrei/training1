@@ -210,8 +210,3 @@ if (isset($_POST['checkout'])) {
 </div>
 
 <?php require_once 'includes/footer.php'; ?>
-
-
-
-
-

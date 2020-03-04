@@ -7,7 +7,7 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
     exit();
 }
 
-if (!isset($_GET['id']) && !is_numeric($_GET['id']) && empty($_GET['id'])) {
+if (!isset($_GET['id']) || !is_numeric($_GET['id']) || empty($_GET['id'])) {
     exit('Something went wrong.');
 }
 

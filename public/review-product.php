@@ -7,8 +7,12 @@ $pdo = pdoConnectMysql();
 if (isset($_POST['review'])) {
     $errors = [];
 
-    if (!validateRequiredInput('note')) {
-        $errors['note'] = 'You are not selected any note.';
+    if (!validateRequiredInput('rating')) {
+        $errors['rating'] = 'You are not selected any note.';
+    }
+
+    if ($_POST['rating'] < 1 || $_POST['rating'] > 5) {
+        $errors['rating'] = 'Please select a rating between 1 and 5.';
     }
 
     if (!validateRequiredInput('title')) {
@@ -20,26 +24,18 @@ if (isset($_POST['review'])) {
     }
 
     if (!$errors) {
-        $data = [
-            strip_tags($_POST['note']),
-            strip_tags($_POST['title']),
-            strip_tags($_POST['description']),
-        ];
-
-        $sql = 'INSERT INTO reviews (note, title, description) VALUES (?, ?, ?)';
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute($data);
-
-        $reviewId = $pdo->lastInsertId();
-
-        $stmt = $pdo->prepare('INSERT INTO product_review (product_id, review_id) VALUES (?, ?)');
-
         $productId = strip_tags($_POST['product_id']);
 
-        $stmt->execute([
-            (int) $productId,
-            (int) $reviewId,
-        ]);
+        $data = [
+            strip_tags($_POST['rating']),
+            strip_tags($_POST['title']),
+            strip_tags($_POST['description']),
+            $productId,
+        ];
+
+        $sql = 'INSERT INTO reviews (rating, title, description, product_id) VALUES (?, ?, ?, ?)';
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($data);
 
         header('Location: review-product.php?id='.$productId);
         exit();
@@ -59,26 +55,24 @@ if ($getRequest || isset($_POST['review'])) {
         exit('No product.');
     }
 
-    $sql = 'SELECT * FROM reviews INNER JOIN product_review
-            ON reviews.id = product_review.review_id
-            WHERE product_review.product_id = ?';
+    $sql = 'SELECT * FROM reviews WHERE product_id = ?';
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$id]);
     $reviewProduct = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-if (isset($_POST['review_id_to_remove']) && $_POST['review_id_to_remove']) {
-    $id = (int) $_POST['review_id_to_remove'];
+if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']) {
+    if (isset($_POST['review_id_to_remove']) && $_POST['review_id_to_remove']) {
+        $id = (int) $_POST['review_id_to_remove'];
 
-    $stmt = $pdo->prepare('DELETE FROM product_review WHERE review_id = ?');
-    $stmt->execute([$id]);
+        $stmt = $pdo->prepare('DELETE FROM reviews WHERE id = ?');
+        $stmt->execute([$id]);
 
-    $stmt = $pdo->prepare('DELETE FROM reviews WHERE id = ?');
-    $stmt->execute([$id]);
-
-    header('Location: review-product.php?id='.strip_tags($_POST['product_id']));
-    exit();
+        header('Location: review-product.php?id='.strip_tags($_POST['product_id']));
+        exit();
+    }
 }
+
 ?>
 
 <?php require_once 'includes/header.php'; ?>
@@ -103,8 +97,8 @@ if (isset($_POST['review_id_to_remove']) && $_POST['review_id_to_remove']) {
 <?php foreach ($reviewProduct as $review) : ?>
     <div style="width: 600px; height: auto; margin: 10px auto; border: 1px solid black;">
         <div>
-            <span><b><?= trans('Note:'); ?></b></span>
-            <span><?= $review['note']; ?></span>
+            <span><b><?= trans('Rating:'); ?></b></span>
+            <span><?= $review['rating']; ?></span>
         </div>
 
         <div>
@@ -120,7 +114,7 @@ if (isset($_POST['review_id_to_remove']) && $_POST['review_id_to_remove']) {
         <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']) : ?>
             <div>
                 <form action="review-product.php" method="POST">
-                    <input type="hidden" name="review_id_to_remove" value="<?= $review['review_id']; ?>">
+                    <input type="hidden" name="review_id_to_remove" value="<?= $review['id']; ?>">
                     <input type="hidden" name="product_id" value="<?= $product['id']; ?>">
 
                     <button type="submit"><?= trans('Delete review'); ?></button>
@@ -135,44 +129,44 @@ if (isset($_POST['review_id_to_remove']) && $_POST['review_id_to_remove']) {
         <input type="hidden" name="product_id" id="product_id" value="<?= $product['id']; ?>">
         <div>
             <div>
-                <label for="note"><?= trans('Note:'); ?></label>
+                <label for="rating"><?= trans('Rating:'); ?></label>
             </div>
 
             <div>
                 <input type="radio"
-                       name="note"
-                       id="note"
+                       name="rating"
+                       id="rating"
                        value="5"
-                       <?= isset($_POST['note']) && $_POST['note'] === '5' ? 'checked' : ''; ?>/> 5
+                    <?= isset($_POST['rating']) && $_POST['rating'] === '5' ? 'checked' : ''; ?>/> 5
 
                 <input type="radio"
-                       name="note"
-                       id="note"
+                       name="rating"
+                       id="rating"
                        value="4"
-                       <?= isset($_POST['note']) && $_POST['note'] === '4' ? 'checked' : ''; ?>/> 4
+                    <?= isset($_POST['rating']) && $_POST['rating'] === '4' ? 'checked' : ''; ?>/> 4
 
                 <input type="radio"
-                       name="note"
-                       id="note"
+                       name="rating"
+                       id="rating"
                        value="3"
-                       <?= isset($_POST['note']) && $_POST['note'] === '3' ? 'checked' : ''; ?>/> 3
+                    <?= isset($_POST['rating']) && $_POST['rating'] === '3' ? 'checked' : ''; ?>/> 3
 
                 <input type="radio"
-                       name="note"
-                       id="note"
+                       name="rating"
+                       id="rating"
                        value="2"
-                       <?= isset($_POST['note']) && $_POST['note'] === '2' ? 'checked' : ''; ?>/> 2
+                    <?= isset($_POST['rating']) && $_POST['rating'] === '2' ? 'checked' : ''; ?>/> 2
 
                 <input type="radio"
-                       name="note"
-                       id="note"
+                       name="rating"
+                       id="rating"
                        value="1"
-                       <?= isset($_POST['note']) && $_POST['note'] === '1' ? 'checked' : ''; ?>/> 1
+                    <?= isset($_POST['rating']) && $_POST['rating'] === '1' ? 'checked' : ''; ?>/> 1
             </div>
 
-            <?php if (isset($errors['note'])) : ?>
+            <?php if (isset($errors['rating'])) : ?>
                 <div style="color: red;">
-                    <?= $errors['note']; ?>
+                    <?= $errors['rating']; ?>
                 </div>
             <?php endif; ?>
         </div>

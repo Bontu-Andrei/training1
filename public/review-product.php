@@ -85,7 +85,7 @@ if (isset($_POST['review_id_to_remove']) && $_POST['review_id_to_remove']) {
 <div style="border: 1px solid black; width: 600px; height: 120px; margin: 10px auto; display: flex;
                                  align-items: center; justify-content: space-evenly;">
 
-    <img src="<?php echo getImagePath($product); ?>" alt="<?= trans('product_image'); ?>"
+    <img src="<?= getImagePath($product); ?>" alt="<?= trans('product_image'); ?>"
          style="width: 100px; height: 100px;">
 
     <div>

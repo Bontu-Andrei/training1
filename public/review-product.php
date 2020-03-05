@@ -4,25 +4,6 @@ require_once 'common.php';
 
 $pdo = pdoConnectMysql();
 
-if (isset($_GET['id']) && is_numeric($_GET['id']) && !empty($_GET['id'])) {
-    $id = (int) $_GET['id'];
-
-    $stmt = $pdo->prepare('SELECT * FROM products WHERE id = ?');
-    $stmt->execute([$id]);
-    $product = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (empty($product)) {
-        exit('No product.');
-    }
-
-    $sql = 'SELECT * FROM reviews INNER JOIN product_review
-            ON reviews.id = product_review.review_id
-            WHERE product_review.product_id = ?';
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$id]);
-    $reviewProduct = $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
 if (isset($_POST['review'])) {
     $errors = [];
 
@@ -65,13 +46,37 @@ if (isset($_POST['review'])) {
     }
 }
 
+$getRequest = isset($_GET['id']) && is_numeric($_GET['id']) && !empty($_GET['id']);
+
+if ($getRequest || isset($_POST['review'])) {
+    $id = (int) $getRequest ? $_GET['id'] : $_POST['product_id'];
+
+    $stmt = $pdo->prepare('SELECT * FROM products WHERE id = ?');
+    $stmt->execute([$id]);
+    $product = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (empty($product)) {
+        exit('No product.');
+    }
+
+    $sql = 'SELECT * FROM reviews INNER JOIN product_review
+            ON reviews.id = product_review.review_id
+            WHERE product_review.product_id = ?';
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$id]);
+    $reviewProduct = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
 if (isset($_POST['review_id_to_remove']) && $_POST['review_id_to_remove']) {
     $id = (int) $_POST['review_id_to_remove'];
 
-    $stmt = $pdo->prepare('DELETE FROM product_review WHERE id = ?');
+    $stmt = $pdo->prepare('DELETE FROM product_review WHERE review_id = ?');
     $stmt->execute([$id]);
 
-    header('Location: index.php');
+    $stmt = $pdo->prepare('DELETE FROM reviews WHERE id = ?');
+    $stmt->execute([$id]);
+
+    header('Location: review-product.php?id='.strip_tags($_POST['product_id']));
     exit();
 }
 ?>
@@ -115,7 +120,8 @@ if (isset($_POST['review_id_to_remove']) && $_POST['review_id_to_remove']) {
         <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']) : ?>
             <div>
                 <form action="review-product.php" method="POST">
-                    <input type="hidden" name="review_id_to_remove" value="<?= $review['id']; ?>">
+                    <input type="hidden" name="review_id_to_remove" value="<?= $review['review_id']; ?>">
+                    <input type="hidden" name="product_id" value="<?= $product['id']; ?>">
 
                     <button type="submit"><?= trans('Delete review'); ?></button>
                 </form>
@@ -133,11 +139,35 @@ if (isset($_POST['review_id_to_remove']) && $_POST['review_id_to_remove']) {
             </div>
 
             <div>
-                <input type="radio" name="note" id="note" value="5"/> 5
-                <input type="radio" name="note" id="note" value="4"/> 4
-                <input type="radio" name="note" id="note" value="3"/> 3
-                <input type="radio" name="note" id="note" value="2"/> 2
-                <input type="radio" name="note" id="note" value="1"/> 1
+                <input type="radio"
+                       name="note"
+                       id="note"
+                       value="5"
+                       <?= isset($_POST['note']) && $_POST['note'] === '5' ? 'checked' : ''; ?>/> 5
+
+                <input type="radio"
+                       name="note"
+                       id="note"
+                       value="4"
+                       <?= isset($_POST['note']) && $_POST['note'] === '4' ? 'checked' : ''; ?>/> 4
+
+                <input type="radio"
+                       name="note"
+                       id="note"
+                       value="3"
+                       <?= isset($_POST['note']) && $_POST['note'] === '3' ? 'checked' : ''; ?>/> 3
+
+                <input type="radio"
+                       name="note"
+                       id="note"
+                       value="2"
+                       <?= isset($_POST['note']) && $_POST['note'] === '2' ? 'checked' : ''; ?>/> 2
+
+                <input type="radio"
+                       name="note"
+                       id="note"
+                       value="1"
+                       <?= isset($_POST['note']) && $_POST['note'] === '1' ? 'checked' : ''; ?>/> 1
             </div>
 
             <?php if (isset($errors['note'])) : ?>
